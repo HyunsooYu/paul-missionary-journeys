@@ -23,16 +23,18 @@ Google 지도·위성사진·거리뷰는 API 키 없이 새 창으로 열립니
 MapLibre 라이선스: `maplibre-LICENSE.txt`
 
 
-## 사건 옆 거리뷰 썸네일
+## 사건 옆 사진과 거리뷰 연결
 
-선택한 사건 카드 오른쪽의 거리뷰 영역은 해당 도시 좌표의 Google Maps 거리뷰로 연결됩니다. 사건 숨김과 함께 접히며, 도시를 바꾸면 링크와 사진 위치가 함께 바뀝니다.
+35개 방문 장소에 도시·유적·인근 지역의 참고 사진을 표시합니다. 사진을 누르면 선택한 도시 좌표의 Google Maps 거리뷰가 새 창으로 열립니다. 사진은 Google 거리뷰 캡처가 아니며 촬영 당시 모습입니다. 루스드라와 더베는 각각 코니아 지역과 카라만 지역 사진이라고 구분해 표시합니다.
 
-실제 사진은 `site-config.mjs`의 `GOOGLE_STREETVIEW_STATIC_API_KEY`를 설정하면 Street View Static API에서 직접 불러옵니다. 이 API는 Maps Embed API와 별도로 활성화해야 하며, 결제 계정 및 요청별 과금이 적용됩니다. 키는 해당 API와 `https://hyunsooyu.github.io/*` 웹사이트로 제한하세요. 서버 비밀 키는 사용하지 마세요.
+사진은 저장소에 포함하므로 API 키 없이 표시됩니다. 저작자와 라이선스는 사진 바로 아래에 표시하고 원본과 이용 조건으로 연결합니다. 전체 출처는 `PHOTO_CREDITS.md`와 `place-photos.mjs`에 있습니다. 사건 숨김과 함께 접히며, 선택 도시가 바뀌면 사진·출처·거리뷰 링크를 함께 바꿉니다.
 
-키가 없으면 이미지 API를 호출하지 않고 `사진 미리보기 없음`과 거리뷰 연결을 표시합니다. 사진이 없는 지역이나 이미지 요청 실패 시에도 링크는 계속 작동합니다. 사진은 Google의 로고·출처를 가리지 않고 원본 비율로 표시합니다.
+`site-config.mjs`의 `GOOGLE_STREETVIEW_STATIC_API_KEY`를 설정하면 Google Street View Static API의 실제 거리뷰 사진을 우선 표시합니다. 해당 API를 별도로 활성화하고, 브라우저용 키를 API와 배포 도메인에 제한해야 합니다. 요청별 과금이 적용될 수 있습니다. 이미지 요청 실패 시 현지 참고 사진으로 전환합니다.
 
+Google은 Street View 캡처 재게시를 허용하지 않으므로 캡처 파일을 저장하지 않습니다. 공식 공유 임베드는 API 키 없이 사용할 수 있으나, 작은 썸네일에는 최소 200×200 크기가 맞지 않아 사용하지 않습니다.
+
+- https://about.google/brand-resource-center/products-and-services/geo-guidelines/
 - https://developers.google.com/maps/documentation/streetview/overview
-- https://developers.google.com/maps/documentation/streetview/request-streetview
 
 
 ## 바다와 육지 구분

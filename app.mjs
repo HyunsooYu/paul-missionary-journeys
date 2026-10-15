@@ -1,5 +1,6 @@
 import * as maplibregl from './maplibre-gl.mjs';
 import { GOOGLE_MAPS_EMBED_API_KEY, GOOGLE_STREETVIEW_STATIC_API_KEY } from './site-config.mjs';
+import { PLACE_PHOTOS } from './place-photos.mjs';
 maplibregl.setWorkerUrl(new URL('./maplibre-gl-worker.mjs', import.meta.url).href);
 const $=id=>document.getElementById(id);
 let eventsVisible=true,drawerPane='event',googleView='map';
@@ -30,14 +31,27 @@ function streetviewThumbnailUrl(place=LOC[stop().key]){
  url.searchParams.set('return_error_code','true');url.searchParams.set('key',GOOGLE_STREETVIEW_STATIC_API_KEY);
  return url.href;
 }
-function updateStreetviewPreview(){
- const l=LOC[stop().key],link=$('streetview-preview'),image=$('streetview-image');
- link.href=googleMapsUrl('streetview',l);link.setAttribute('aria-label',l.name+' · '+l.modern+' Google 거리뷰 새 창에서 열기');
- image.alt=l.modern+' 인근 Google 거리뷰 사진';
- const src=eventsVisible?streetviewThumbnailUrl(l):null;
- if(!src){image.removeAttribute('src');image.hidden=true;$('streetview-empty').hidden=false;link.dataset.state='unavailable';$('streetview-state').textContent='사진 미리보기 없음';return;}
+function showPreviewSource(src,kind,photo=null){
+ const link=$('streetview-preview'),image=$('streetview-image');
+ link.dataset.kind=kind;$('streetview-caption').textContent=kind==='streetview'?'거리뷰 ↗':(photo?.caption||'현지 사진')+' · 거리뷰 ↗';
+ $('place-photo-credit').hidden=!photo;
+ if(photo){
+  $('place-photo-source').href=photo.source;$('place-photo-source').textContent='사진: '+photo.author;
+  $('place-photo-source').title=photo.title+' · 원본과 촬영 정보';
+  $('place-photo-license').href=photo.licenseUrl||photo.source;$('place-photo-license').textContent=photo.license;
+ }
+ image.alt=LOC[stop().key].modern+(kind==='streetview'?' 인근 Google 거리뷰 사진':' 현지 참고 사진');
  if(image.getAttribute('src')===src)return;
  image.hidden=true;$('streetview-empty').hidden=false;link.dataset.state='loading';$('streetview-state').textContent='사진 불러오는 중';image.setAttribute('src',src);
+}
+function updateStreetviewPreview(){
+ const l=LOC[stop().key],link=$('streetview-preview'),image=$('streetview-image'),photo=PLACE_PHOTOS[stop().key];
+ link.href=googleMapsUrl('streetview',l);link.setAttribute('aria-label',l.name+' · '+l.modern+' Google 거리뷰 새 창에서 열기');
+ const streetview=eventsVisible?streetviewThumbnailUrl(l):null;
+ if(streetview){showPreviewSource(streetview,'streetview');return;}
+ if(eventsVisible&&photo){showPreviewSource(photo.src,'place',photo);return;}
+ image.removeAttribute('src');image.hidden=true;$('streetview-empty').hidden=false;link.dataset.state='unavailable';
+ $('streetview-caption').textContent='거리뷰 ↗';$('streetview-state').textContent='거리뷰 열기';$('place-photo-credit').hidden=true;
 }
 function googleEmbedUrl(mode,place=LOC[stop().key]){
  if(!GOOGLE_MAPS_EMBED_API_KEY)return null;
@@ -275,7 +289,9 @@ $('streetview-image').addEventListener('load',()=>{
  $('streetview-image').hidden=false;$('streetview-empty').hidden=true;$('streetview-preview').dataset.state='ready';
 });
 $('streetview-image').addEventListener('error',()=>{
- $('streetview-image').hidden=true;$('streetview-empty').hidden=false;$('streetview-preview').dataset.state='unavailable';$('streetview-state').textContent='사진 미리보기 없음';
+ const photo=PLACE_PHOTOS[stop().key];
+ if(eventsVisible&&$('streetview-preview').dataset.kind==='streetview'&&photo){showPreviewSource(photo.src,'place',photo);return;}
+ $('streetview-image').hidden=true;$('streetview-empty').hidden=false;$('streetview-preview').dataset.state='unavailable';$('streetview-state').textContent='거리뷰 열기';$('place-photo-credit').hidden=true;
 });
 $('toggle-events').addEventListener('click',()=>setEventsVisible(!eventsVisible));
 $('modern-open').addEventListener('click',()=>showDrawer(true,'present'));
