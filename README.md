@@ -33,3 +33,8 @@ MapLibre 라이선스: `maplibre-LICENSE.txt`
 
 - https://developers.google.com/maps/documentation/streetview/overview
 - https://developers.google.com/maps/documentation/streetview/request-streetview
+
+
+## 바다와 육지 구분
+
+기본 지도는 육지 `#897859` / 바다 `#092d49`, 밝은 지도는 육지 `#f0e3c0` / 바다 `#277da8`로 표시합니다. 물 영역의 테두리도 밝게 강조하며, 스타일 전환 후에도 적용됩니다. 대체 지도는 지형색을 유지하도록 채도·밝기를 조정했습니다.

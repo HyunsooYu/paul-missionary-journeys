@@ -160,8 +160,28 @@ const TRIPS={
 };
 
 const STYLES={night:'https://tiles.openfreemap.org/styles/fiord',bright:'https://tiles.openfreemap.org/styles/bright'};
+// Keep coastlines readable in both base-map themes.
+function applySurfaceContrast(){
+ if(fallbackActive)return;
+ const p=currentStyle==='night'?{land:'#897859',water:'#092d49',coast:'#7cc9e5',forest:'#596b4e',park:'#76805a'}:{land:'#f0e3c0',water:'#277da8',coast:'#bce8f5'};
+ for(const layer of map.getStyle().layers){
+  const source=layer['source-layer'];
+  if(layer.type==='background')map.setPaintProperty(layer.id,'background-color',p.land);
+  if(layer.type==='fill'&&source==='water'){
+   map.setPaintProperty(layer.id,'fill-color',p.water);map.setPaintProperty(layer.id,'fill-opacity',1);
+   map.setPaintProperty(layer.id,'fill-antialias',true);map.setPaintProperty(layer.id,'fill-outline-color',p.coast);
+  }
+  if(layer.type==='line'&&source==='waterway')map.setPaintProperty(layer.id,'line-color',currentStyle==='night'?'#79bad8':'#277da8');
+  if(currentStyle==='night'&&layer.type==='fill'&&(source==='landcover'||source==='park')){
+   map.setPaintProperty(layer.id,'fill-color',source==='park'?p.park:layer.id.includes('ice')?'#d4d6c4':p.forest);
+  }
+  if(layer.type==='symbol'&&source==='water_name'){
+   map.setPaintProperty(layer.id,'text-color','#d9f3ff');map.setPaintProperty(layer.id,'text-halo-color',p.water);map.setPaintProperty(layer.id,'text-halo-width',1);
+  }
+ }
+}
 // A second provider keeps the route usable when the primary tile service is slow.
-function fallbackStyle(){return {version:8,sources:{'osm-fallback':{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}},layers:[{id:'osm-basemap',type:'raster',source:'osm-fallback',paint:currentStyle==='night'?{'raster-saturation':-.75,'raster-brightness-max':.55,'raster-contrast':.1}:{}}]};}
+function fallbackStyle(){return {version:8,sources:{'osm-fallback':{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}},layers:[{id:'osm-basemap',type:'raster',source:'osm-fallback',paint:currentStyle==='night'?{'raster-saturation':.15,'raster-brightness-max':.95,'raster-contrast':.1}:{}}]};}
 let fallbackActive=false, baseTileReady=false, styleGeneration=0, mapWatchdog;
 function connection(state){$('map-status').dataset.state=state;$('map-status').textContent=state==='ready'?'지도 연결됨':state==='error'?'연결 확인 필요':'지도 연결 중';}
 function watchMap(){
@@ -183,7 +203,7 @@ const map=new maplibregl.Map({container:'map',style:STYLES.night,center:[26.2,39
 map.addControl(new maplibregl.AttributionControl({compact:false}),'bottom-right');
 map.dragRotate.enable();map.touchZoomRotate.enableRotation();
 map.on('error',e=>{if(e?.error?.message) console.warn('Map:',e.error.message)});
-map.on('style.load',()=>{mapReady=true;installLayers();render(true);if(styleGeneration===0)fit();});
+map.on('style.load',()=>{mapReady=true;applySurfaceContrast();installLayers();render(true);if(styleGeneration===0)fit();});
 map.on('sourcedata',e=>{
  if(e.sourceId!==(fallbackActive?'osm-fallback':'openmaptiles')||e.sourceDataType!=='content'||!['vector','raster'].includes(e.source?.type))return;
  baseTileReady=true;clearTimeout(mapWatchdog);connection('ready');$('error').classList.remove('show');
