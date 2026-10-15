@@ -1,5 +1,5 @@
 import * as maplibregl from './maplibre-gl.mjs';
-import { GOOGLE_MAPS_EMBED_API_KEY } from './site-config.mjs';
+import { GOOGLE_MAPS_EMBED_API_KEY, GOOGLE_STREETVIEW_STATIC_API_KEY } from './site-config.mjs';
 maplibregl.setWorkerUrl(new URL('./maplibre-gl-worker.mjs', import.meta.url).href);
 const $=id=>document.getElementById(id);
 let eventsVisible=true,drawerPane='event',googleView='map';
@@ -11,7 +11,7 @@ function setEventsVisible(visible,persist=true){
  $('toggle-events').textContent=visible?'사건 숨기기':'사건 표시';$('toggle-events').setAttribute('aria-expanded',String(visible));
  $('player-city').textContent=visible?stop().title:LOC[stop().key].name;
  if(persist){try{localStorage.setItem('paul.events.visible',visible?'1':'0');}catch{}}
- syncPanelLayout();
+ updateStreetviewPreview();syncPanelLayout();
 }
 function googleMapsUrl(mode,place=LOC[stop().key]){
  const coordinate=place.lat+','+place.lon;
@@ -22,6 +22,23 @@ function googleMapsUrl(mode,place=LOC[stop().key]){
  else{url.searchParams.set('map_action','map');url.searchParams.set('center',coordinate);url.searchParams.set('zoom','15');url.searchParams.set('basemap','satellite');}
  return url.href;
 }
+function streetviewThumbnailUrl(place=LOC[stop().key]){
+ if(!GOOGLE_STREETVIEW_STATIC_API_KEY)return null;
+ const url=new URL('https://maps.googleapis.com/maps/api/streetview');
+ url.searchParams.set('size','320x200');url.searchParams.set('location',place.lat+','+place.lon);
+ url.searchParams.set('fov','90');url.searchParams.set('pitch','0');url.searchParams.set('radius','1000');
+ url.searchParams.set('return_error_code','true');url.searchParams.set('key',GOOGLE_STREETVIEW_STATIC_API_KEY);
+ return url.href;
+}
+function updateStreetviewPreview(){
+ const l=LOC[stop().key],link=$('streetview-preview'),image=$('streetview-image');
+ link.href=googleMapsUrl('streetview',l);link.setAttribute('aria-label',l.name+' · '+l.modern+' Google 거리뷰 새 창에서 열기');
+ image.alt=l.modern+' 인근 Google 거리뷰 사진';
+ const src=eventsVisible?streetviewThumbnailUrl(l):null;
+ if(!src){image.removeAttribute('src');image.hidden=true;$('streetview-empty').hidden=false;link.dataset.state='unavailable';$('streetview-state').textContent='사진 미리보기 없음';return;}
+ if(image.getAttribute('src')===src)return;
+ image.hidden=true;$('streetview-empty').hidden=false;link.dataset.state='loading';$('streetview-state').textContent='사진 불러오는 중';image.setAttribute('src',src);
+}
 function googleEmbedUrl(mode,place=LOC[stop().key]){
  if(!GOOGLE_MAPS_EMBED_API_KEY)return null;
  const coordinate=place.lat+','+place.lon,url=new URL('https://www.google.com/maps/embed/v1/'+(mode==='streetview'?'streetview':'view'));
@@ -31,7 +48,7 @@ function googleEmbedUrl(mode,place=LOC[stop().key]){
  return url.href;
 }
 function updatePresentPlace(){
- const l=LOC[stop().key];
+ const l=LOC[stop().key];updateStreetviewPreview();
  for(const mode of ['map','satellite','streetview']){$('google-'+mode).href=googleMapsUrl(mode,l);$('google-'+mode).setAttribute('aria-label',l.name+' '+(mode==='map'?'Google 지도':mode==='satellite'?'위성사진':'거리뷰')+' 새 창에서 열기');}
  $('present-coordinates').textContent=l.lat.toFixed(4)+'° N · '+l.lon.toFixed(4)+'° E';
  const enabled=!!GOOGLE_MAPS_EMBED_API_KEY;$('google-embed').hidden=!enabled;
@@ -234,6 +251,12 @@ async function play(){if(!mapReady)return;if(playing){pause();return}let ss=seq(
 function changeStyle(){currentStyle=currentStyle==='night'?'bright':'night';$('style').classList.toggle('active',currentStyle==='bright');loadBasemap();}
 function showDrawer(open,pane='event'){$('drawer').classList.toggle('open',open);$('shade').classList.toggle('open',open);if(open)setDrawerPane(pane);}
 for(const b of document.querySelectorAll('[data-trip]'))b.addEventListener('click',()=>switchTrip(+b.dataset.trip));
+$('streetview-image').addEventListener('load',()=>{
+ $('streetview-image').hidden=false;$('streetview-empty').hidden=true;$('streetview-preview').dataset.state='ready';
+});
+$('streetview-image').addEventListener('error',()=>{
+ $('streetview-image').hidden=true;$('streetview-empty').hidden=false;$('streetview-preview').dataset.state='unavailable';$('streetview-state').textContent='사진 미리보기 없음';
+});
 $('toggle-events').addEventListener('click',()=>setEventsVisible(!eventsVisible));
 $('modern-open').addEventListener('click',()=>showDrawer(true,'present'));
 for(const pane of ['event','present']){

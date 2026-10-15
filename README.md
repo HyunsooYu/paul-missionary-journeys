@@ -21,3 +21,15 @@ Google 지도·위성사진·거리뷰는 API 키 없이 새 창으로 열립니
 좌표는 고대 도시의 근사 위치이며, 거리뷰 제공 범위와 촬영 시점은 지역마다 다릅니다.
 
 MapLibre 라이선스: `maplibre-LICENSE.txt`
+
+
+## 사건 옆 거리뷰 썸네일
+
+선택한 사건 카드 오른쪽의 거리뷰 영역은 해당 도시 좌표의 Google Maps 거리뷰로 연결됩니다. 사건 숨김과 함께 접히며, 도시를 바꾸면 링크와 사진 위치가 함께 바뀝니다.
+
+실제 사진은 `site-config.mjs`의 `GOOGLE_STREETVIEW_STATIC_API_KEY`를 설정하면 Street View Static API에서 직접 불러옵니다. 이 API는 Maps Embed API와 별도로 활성화해야 하며, 결제 계정 및 요청별 과금이 적용됩니다. 키는 해당 API와 `https://hyunsooyu.github.io/*` 웹사이트로 제한하세요. 서버 비밀 키는 사용하지 마세요.
+
+키가 없으면 이미지 API를 호출하지 않고 `사진 미리보기 없음`과 거리뷰 연결을 표시합니다. 사진이 없는 지역이나 이미지 요청 실패 시에도 링크는 계속 작동합니다. 사진은 Google의 로고·출처를 가리지 않고 원본 비율로 표시합니다.
+
+- https://developers.google.com/maps/documentation/streetview/overview
+- https://developers.google.com/maps/documentation/streetview/request-streetview
