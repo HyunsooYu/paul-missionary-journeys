@@ -52,7 +52,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:1500px;margin:0 auto}
-h1,h2,h3{margin:0;text-wrap:balance}
+h1,h2,h3{margin:0;text-wrap:balance;word-break:keep-all}
 h1{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,3.4vw,3.2rem);line-height:1.12;letter-spacing:-.01em}
 h2{font-family:var(--display);font-weight:400;font-size:clamp(1.3rem,2vw,1.8rem);line-height:1.2}
 h3{font-size:1rem;font-weight:700}
@@ -324,12 +324,192 @@ body.present .pres-bar{display:flex}
 .drawer{position:fixed;inset:0;z-index:50;display:flex;justify-content:flex-end;background:var(--scrim)}
 .sheet{width:min(34rem,100%);height:100%;overflow:auto;background:var(--bg);padding:calc(1.1rem + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(1.2rem + env(safe-area-inset-bottom,0px)) 16px;display:flex;flex-direction:column;gap:1rem}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:45}
+
+/* ---------- stage slides: a 1920×1080 canvas scaled to the screen.
+   The stage keeps its own light/dark look (chosen on stage), independent of the device theme. ---------- */
+:root{
+  --sl-bg:#F4F7F5;--sl-ink:#132019;--sl-muted:#56645D;--sl-line:#D2DCD6;--sl-card:#FFFFFF;--sl-sunk:#E3EAE5;--sl-edge:#DCE4DF;
+  --sl-warn:#B06600;--sl-bad:#C8343A;--sl-cracker:#E8C27C;--sl-cracker-edge:#C3924A;--sl-blank:#000000;
+}
+.deck{position:fixed;inset:0;z-index:80;background:var(--sl-edge);overflow:hidden;color-scheme:light}
+.deck[data-look="dark"]{--sl-bg:#0F1513;--sl-ink:#F0F5F1;--sl-muted:#A2AEA7;--sl-line:#2A3530;--sl-card:#18201C;--sl-sunk:#232C27;--sl-edge:#060908;
+  --sl-warn:#F0AE48;--sl-bad:#F27479;--sl-cracker:#C99E5E;--sl-cracker-edge:#9A7034;color-scheme:dark}
+html.deck-on,html.deck-on body{overflow:hidden}
+.slide{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%);transform-origin:center center;background:var(--sl-bg);color:var(--sl-ink);font-family:var(--body);display:flex;flex-direction:column;padding:50px 88px 72px;overflow:hidden;word-break:keep-all}
+.sl-top{display:flex;justify-content:space-between;align-items:center;gap:40px;font-size:30px;font-weight:700;color:var(--sl-muted);flex:none;min-height:56px}
+.sl-top>span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-step{display:inline-flex;align-items:center;gap:14px;background:var(--sl-card);border:2px solid var(--sl-line);border-radius:999px;padding:6px 26px;white-space:nowrap}
+.sl-step i{font-style:normal;font-variant-numeric:tabular-nums;opacity:.7}
+.sl-body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:38px;padding-top:22px}
+.sl-foot{position:absolute;left:0;right:0;bottom:0;height:16px;display:flex}
+.sl-foot i{flex:1;background:var(--tc)}
+.sl-h{font-family:var(--display);font-weight:400;font-size:104px;line-height:1.06;margin:0;letter-spacing:-1px;text-wrap:balance}
+.sl-sub{font-size:46px;font-weight:600;color:var(--sl-muted);margin:0;text-wrap:balance}
+.sl-center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:30px;flex:1}
+.sl-drum{font-size:190px}
+.slide .num{font-variant-numeric:tabular-nums}
+
+/* cover + rules */
+.sl-cover{display:grid;grid-template-columns:minmax(0,1fr) 640px;align-items:center;gap:40px;flex:1}
+.sl-kicker{font-size:40px;font-weight:700;color:var(--sl-muted);margin:0 0 18px}
+.sl-title{font-family:var(--display);font-weight:400;font-size:140px;line-height:1.02;margin:0;letter-spacing:-2px;text-wrap:balance}
+.sl-cover .sl-sub{margin-top:32px;font-size:56px}
+.sl-plate{width:640px;height:auto;display:block}
+.sl-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:22px}
+.sl-steps li{background:var(--sl-card);border:2px solid var(--sl-line);border-top:12px solid var(--tc);border-radius:26px;padding:24px 22px 26px;display:flex;flex-direction:column;gap:12px;min-height:270px}
+.sl-steps b{font-family:var(--display);font-weight:400;font-size:62px;line-height:1;color:var(--sl-muted)}
+.sl-steps span{font-family:var(--display);font-size:46px;line-height:1.1}
+.sl-steps small{font-size:28px;color:var(--sl-muted);font-weight:600;line-height:1.35}
+.sl-rule{border-radius:30px;background:var(--sl-ink);color:var(--sl-bg);padding:30px 44px;display:flex;flex-direction:column;gap:10px}
+.sl-rule span{font-size:30px;font-weight:700;opacity:.8}
+.sl-rule b{font-family:var(--display);font-weight:400;font-size:66px;line-height:1.12}
+.sl-rule small{font-size:36px;font-weight:600;opacity:.92}
+
+/* register */
+.sl-reg{display:grid;grid-template-columns:470px minmax(0,1fr);gap:56px;flex:1;min-height:0;align-items:start}
+.sl-count{display:flex;flex-direction:column;gap:6px;padding-top:12px}
+.sl-count b{font-family:var(--display);font-weight:400;font-size:300px;line-height:.85}
+.sl-count span{font-family:var(--display);font-size:84px}
+.sl-count small{font-size:34px;color:var(--sl-muted);font-weight:600;margin-top:18px;line-height:1.35}
+.sl-names{list-style:none;margin:0;padding:0;display:grid;gap:14px 18px;align-content:start;min-width:0}
+.sl-names li{background:var(--sl-card);border:2px solid var(--sl-line);border-radius:999px;padding:10px 24px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-names li.fresh{border-color:var(--t5);animation:pop .6s cubic-bezier(.2,.9,.3,1.3)}
+
+/* team tickets */
+.sl-tickets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:30px;flex:1;min-height:0}
+.sl-ticket{background:var(--sl-card);border:2px solid var(--sl-line);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;min-height:0;min-width:0}
+.sl-ticket header{background:var(--tc);color:var(--on);display:flex;align-items:center;gap:20px;padding:12px 28px}
+.sl-ticket header b{font-family:var(--display);font-weight:400;font-size:66px;line-height:1}
+.sl-ticket header span{font-size:30px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-ticket header em{font-style:normal;font-family:var(--display);font-size:42px}
+.sl-cname{margin:12px 28px 0;font-family:var(--display);font-size:36px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-ticket ul{list-style:none;margin:0;padding:14px 28px 18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 24px;font-size:40px;font-weight:700;align-content:start}
+.sl-ticket li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* timers */
+.sl-timer{background:var(--sl-card);border:2px solid var(--sl-line);border-radius:38px;padding:30px 44px 42px;display:flex;flex-direction:column;align-items:center;gap:16px;min-width:0}
+.sl-tlabel{font-size:36px;font-weight:700;color:var(--sl-muted)}
+.sl-digits{font-family:var(--display);font-size:320px;line-height:.9;display:flex}
+.sl-digits .d{display:inline-block;width:.6em;text-align:center}
+.sl-digits .c{display:inline-block;width:.3em;text-align:center}
+.sl-bar{width:100%;height:22px;border-radius:999px;background:var(--sl-sunk);overflow:hidden}
+.sl-bar i{display:block;height:100%;width:0;background:var(--sl-ink);transition:width .2s linear}
+.sl-timer.warn .sl-digits{color:var(--sl-warn)}
+.sl-timer.warn .sl-bar i{background:var(--sl-warn)}
+.sl-timer.done .sl-digits{color:var(--sl-bad);animation:blink 1s steps(2) infinite}
+.sl-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:60px;align-items:center;flex:1}
+.sl-list h3{font-family:var(--display);font-weight:400;font-size:64px;margin:0 0 26px}
+.sl-todo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:24px}
+.sl-todo li{display:flex;align-items:center;gap:22px;font-size:52px;font-weight:700}
+.sl-todo li::before{content:"";width:44px;height:44px;border:5px solid var(--sl-ink);border-radius:12px;flex:none}
+.sl-note{margin-top:36px;font-size:36px;font-weight:700;color:var(--sl-warn)}
+.sl-rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:20px;counter-reset:r}
+.sl-rules li{counter-increment:r;display:flex;gap:26px;align-items:baseline;font-size:44px;font-weight:600;background:var(--sl-card);border:2px solid var(--sl-line);border-radius:26px;padding:22px 32px;line-height:1.3}
+.sl-rules li::before{content:counter(r);font-family:var(--display);font-size:60px;line-height:1;color:var(--sl-muted)}
+
+/* ingredients + draft */
+.sl-menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px;flex:1;min-height:0}
+.sl-menu section{background:var(--sl-card);border:2px solid var(--sl-line);border-radius:28px;padding:24px 32px;min-height:0;overflow:hidden}
+.sl-menu h3{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--display);font-weight:400;font-size:58px;margin:0 0 8px}
+.sl-menu h3 small{font-family:var(--body);font-size:28px;font-weight:700;color:var(--sl-muted)}
+.sl-menu ul{list-style:none;margin:0;padding:0}
+.sl-menu li{display:flex;justify-content:space-between;gap:16px;font-size:33px;font-weight:700;padding:7px 0;border-bottom:2px dotted var(--sl-line)}
+.sl-menu li .sets{color:var(--sl-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sl-menu li.limited .sets{color:var(--sl-warn)}
+.sl-menu li.out{color:var(--sl-muted);text-decoration:line-through}
+.sl-now{display:flex;align-items:center;gap:36px;background:var(--tc,var(--sl-ink));color:var(--on,var(--sl-bg));border-radius:34px;padding:26px 44px;flex:none}
+.sl-now span{font-size:32px;font-weight:700;opacity:.85;display:block}
+.sl-now b{font-family:var(--display);font-weight:400;font-size:116px;line-height:1}
+.sl-now em{margin-left:auto;font-style:normal;font-family:var(--display);font-size:72px;white-space:nowrap}
+.sl-ings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.sl-ing{font:inherit;color:var(--sl-ink);background:var(--sl-card);border:3px solid var(--sl-line);border-radius:20px;padding:18px 24px;font-size:40px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;text-align:left;min-width:0}
+.sl-ing small{font-size:28px;color:var(--sl-muted);white-space:nowrap}
+.sl-ing.out{opacity:.32;text-decoration:line-through}
+.sl-ing:disabled{cursor:default}
+.sl-picks{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;margin-top:auto}
+.sl-picks div{background:color-mix(in srgb,var(--tc) 14%,var(--sl-card));border:3px solid var(--tc);border-radius:22px;padding:14px 18px;min-height:150px;min-width:0}
+.sl-picks b{font-family:var(--display);font-weight:400;font-size:44px;display:block}
+.sl-picks span{font-size:28px;font-weight:700;line-height:1.35}
+.sl-rps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:24px}
+.sl-rps li{border:5px dashed var(--sl-line);border-radius:30px;height:270px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.sl-rps li.on{background:var(--tc);color:var(--on);border:5px solid var(--tc)}
+.sl-rps b{font-size:62px;font-weight:700}
+.sl-rps span{font-family:var(--display);font-size:86px;line-height:1}
+
+/* making + voting */
+.sl-make{display:grid;grid-template-columns:700px minmax(0,1fr);gap:44px;flex:1;align-items:center}
+.sl-make .sl-digits{font-size:270px}
+.sl-orders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.sl-order{background:var(--sl-card);border:2px solid var(--sl-line);border-radius:24px;overflow:hidden;min-width:0}
+.sl-order header{background:var(--tc);color:var(--on);font-family:var(--display);font-size:44px;padding:8px 22px}
+.sl-order b{display:block;font-family:var(--display);font-weight:400;font-size:120px;line-height:1;padding:14px 22px 0}
+.sl-order b small{font-size:40px;margin-left:8px}
+.sl-order p{margin:0;padding:8px 22px 18px;font-size:28px;font-weight:700;color:var(--sl-muted);line-height:1.4}
+.sl-vote{display:grid;grid-template-columns:620px minmax(0,1fr);gap:64px;flex:1;align-items:center}
+.sl-qr{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
+.sl-qr .qr-tile{width:580px;padding:24px;border-radius:30px}
+.sl-qr p{font-size:38px;font-weight:700;margin:0}
+.sl-vright{display:flex;flex-direction:column;gap:26px;min-width:0}
+.sl-vright .sl-timer{flex-direction:row;justify-content:space-between;padding:16px 40px}
+.sl-vright .sl-digits{font-size:150px}
+.sl-vright .sl-bar{display:none}
+.sl-vstatus{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+.sl-vstatus li{border:4px dashed var(--sl-line);border-radius:22px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;gap:4px}
+.sl-vstatus b{font-family:var(--display);font-weight:400;font-size:52px}
+.sl-vstatus span{font-size:28px;font-weight:700}
+.sl-vstatus li.done{background:var(--tc);color:var(--on);border:4px solid var(--tc)}
+
+/* results */
+.sl-reveal{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:32px;flex:1;min-height:0}
+.sl-rcard{background:var(--sl-card);border:4px solid var(--tc);border-radius:38px;overflow:hidden;display:flex;flex-direction:column;min-width:0;min-height:0}
+.sl-rcard header{background:var(--tc);color:var(--on);display:flex;align-items:center;gap:30px;padding:22px 40px}
+.sl-rcard .place{font-family:var(--display);font-size:150px;line-height:1;white-space:nowrap}
+.sl-rcard .team{font-family:var(--display);font-size:84px;white-space:nowrap}
+.sl-rcard .score{margin-left:auto;font-family:var(--display);font-size:120px;line-height:1;white-space:nowrap}
+.sl-rcard .score small{font-size:44px;margin-left:6px}
+.sl-reveal.multi .sl-rcard .place{font-size:96px}.sl-reveal.multi .sl-rcard .team{font-size:60px}.sl-reveal.multi .sl-rcard .score{font-size:80px}
+.sl-rcard .cn{font-family:var(--display);font-size:64px;padding:24px 40px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-quotes{list-style:none;margin:0;padding:22px 40px 34px;display:flex;flex-direction:column;gap:18px}
+.sl-quotes li{background:color-mix(in srgb,var(--tc) 14%,var(--sl-card));border-radius:22px;padding:18px 28px;font-size:42px;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.sl-quotes cite{display:block;font-style:normal;font-size:28px;color:var(--sl-muted);margin-top:6px}
+.sl-reveal.multi .sl-quotes li{font-size:32px}
+.sl-rcard.new{animation:rise .8s cubic-bezier(.2,.9,.3,1.2)}
+.sl-podium{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:end;flex:1;min-height:0}
+.sl-pcol{display:flex;flex-direction:column;gap:18px;min-width:0}
+.sl-pcard{background:var(--sl-card);border:4px solid var(--tc);border-radius:28px;overflow:hidden}
+.sl-pcard header{background:var(--tc);color:var(--on);display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:14px 28px;font-family:var(--display)}
+.sl-pcard header b{font-size:62px;font-weight:400}
+.sl-pcard header span{font-size:46px}
+.sl-pcard p{margin:0;padding:14px 28px 20px;font-size:34px;font-weight:700;color:var(--sl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-pstep{background:var(--sl-sunk);border-radius:26px 26px 0 0;display:grid;place-items:center;font-family:var(--display);font-size:92px}
+.sl-pcol.p1 .sl-pstep{height:300px}.sl-pcol.p2 .sl-pstep{height:200px}.sl-pcol.p3 .sl-pstep{height:130px}
+.sl-winners{display:grid;gap:32px;flex:1;min-height:0}
+.sl-wcard{background:var(--sl-card);border:4px solid var(--tc);border-radius:32px;overflow:hidden;display:flex;flex-direction:column;min-height:0;min-width:0}
+.sl-wcard header{background:var(--tc);color:var(--on);display:flex;align-items:baseline;gap:22px;padding:16px 32px;font-family:var(--display)}
+.sl-wcard header b{font-size:84px;font-weight:400}
+.sl-wcard header span{font-size:44px;white-space:nowrap}
+.sl-wcard ul{list-style:none;margin:0;padding:20px 32px;display:grid;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr));gap:8px 24px;font-size:46px;font-weight:700}
+.sl-wcard li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* stage chrome */
+.sl-blank{position:absolute;inset:0;background:var(--sl-blank);z-index:1}
+.sl-ctrl{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:8px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s;max-width:calc(100% - 24px);font-family:var(--body);font-size:15px;z-index:3}
+.deck.show-ctrl .sl-ctrl{opacity:1;pointer-events:auto}
+.sl-ctrl select{width:auto;padding:.3rem .5rem;font-size:14px}
+.sl-ctrl .sep{width:1px;align-self:stretch;background:var(--line);margin:0 4px}
+.sl-ctrl .team-mini{border:0;border-radius:8px;padding:.3rem .55rem;font-weight:800;cursor:pointer;background:var(--tc);color:var(--on)}
+.sl-ctrl .team-mini:disabled{opacity:.25}
+.sl-hint{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);padding:.55rem 1rem;border-radius:12px;font-weight:700;z-index:3;font-family:var(--body);font-size:15px;transition:opacity .4s}
+.stage-pill{position:fixed;left:calc(12px + env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:.35rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.3rem .4rem .3rem .85rem;box-shadow:var(--shadow);font-weight:700;font-size:.82rem;max-width:calc(100% - 24px)}
+.stage-pill .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:12rem}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div id="drawer" class="drawer" hidden></div>
+<div id="deck" class="deck" hidden><div id="slide" class="slide"></div><div id="sl-blank" class="sl-blank" hidden></div><div class="sl-ctrl" role="toolbar" aria-label="슬라이드 조작"></div><div id="sl-hint" class="sl-hint" hidden></div></div>
+<div id="stage-pill" class="stage-pill" hidden></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <canvas id="confetti" aria-hidden="true" hidden></canvas>
 <script>
@@ -610,6 +790,14 @@ function makeMemDB(persistKey) {
   });
   return {
     doc: docRef,
+    // a stage window re-reads what the laptop's main tab saved
+    _rehydrate: () => {
+      const saved = ls.get(persistKey, null) || {};
+      docs.clear();
+      Object.keys(saved).forEach(k => docs.set(k, saved[k]));
+      colL.forEach((set, cp) => set.forEach(f => f(snapCol(cp))));
+      docL.forEach((set, p) => set.forEach(f => f(snapDoc(p))));
+    },
     collection: cp => ({
       path: cp,
       doc: id => docRef(cp + '/' + (id || Math.random().toString(36).slice(2, 10))),
@@ -659,7 +847,7 @@ function applyEvent(d) {
   S.state = {
     rps: arr(st.rps).map(Number).filter((t, i, a) => TEAMS.indexOf(t) >= 0 && a.indexOf(t) === i).slice(0, 6),
     picks: arr(st.picks).filter(p => p && typeof p === 'object').map(p => ({team: Number(p.team), cat: String(p.cat), name: p.name ? String(p.name) : null, round: Number(p.round) || 0})),
-    timer: obj(st.timer), voting: obj(st.voting), reveal: obj(st.reveal), hidden: obj(st.hidden),
+    timer: obj(st.timer), voting: obj(st.voting), reveal: obj(st.reveal), hidden: obj(st.hidden), stage: obj(st.stage),
     voteResetAt: Number(st.voteResetAt) || 0
   };
   const ro = obj(d.roster);
@@ -698,6 +886,7 @@ function voteLink() {
 /* ---------- writes ---------- */
 const chains = {};
 function canMutate() {
+  if (ui.stageView) return false;
   if (revoked) { toast('접근 권한이 바뀌어 저장할 수 없어요', 'bad'); return false; }
   if (readOnly) { toast('보기 전용이라 저장할 수 없어요', 'bad'); return false; }
   if (!db) { toast('아직 연결 중이에요. 잠시 뒤 다시 눌러 주세요'); return false; }
@@ -1207,6 +1396,15 @@ async function phoneSend(kind, t, body) {
 function phoneLinkReady() { return busUp() > 0 && PH.lastStateAt > 0; }
 
 async function relayConnect() {
+  if (currentMode() === 'stage') {
+    db = makeMemDB('kc-db-v1');
+    dbMode = 'device';
+    subscribeAll();
+    window.addEventListener('storage', e => { if (e.key === 'kc-db-v1' && db._rehydrate) db._rehydrate(); });
+    try { const ch = new BroadcastChannel('kc-stage'); const ping = () => ch.postMessage('stage-here'); ping(); setInterval(ping, 4000); } catch (e) { /* older browser */ }
+    scheduleRender();
+    return;
+  }
   const vote = currentMode() === 'vote';
   const ident = vote ? phoneIdentity() : hostIdentity();
   if (vote) {
@@ -1220,6 +1418,9 @@ async function relayConnect() {
       const ch = new BroadcastChannel('kc-host');
       ch.onmessage = e => { if (e.data === 'hello') ch.postMessage('here'); HOST.dupTab = true; scheduleRender(); };
       ch.postMessage('hello');
+      const sc = new BroadcastChannel('kc-stage');
+      sc.onmessage = e => { if (e.data === 'stage-here') { const was = HOST.stageSeen && Date.now() - HOST.stageSeen < 10000; HOST.stageSeen = Date.now(); if (!was) scheduleRender(); } };
+      setInterval(() => { if (HOST.stageSeen && Date.now() - HOST.stageSeen > 10000 && Date.now() - HOST.stageSeen < 15000) scheduleRender(); }, 5000);
     } catch (e) { /* older browser */ }
   }
   try { cryptoKey = await importKey(ident.k); } catch (e) { cryptoKey = null; }
@@ -1809,6 +2010,7 @@ let built = null, lastStageHtml = '', queued = false;
 function currentMode() {
   const h = location.hash;
   if (h.indexOf('#vote') === 0) return 'vote';
+  if (h === '#stage') return 'stage';
   if (h === '#ops' || ui.forceOperator) return 'operator';
   return window.matchMedia && window.matchMedia('(max-width: 700px)').matches ? 'choose' : 'operator';
 }
@@ -1822,10 +2024,14 @@ function render() {
   const mode = currentMode();
   document.body.classList.toggle('present', ui.present && mode === 'operator');
   document.body.classList.toggle('readonly', (readOnly || revoked) && mode === 'operator');
-  if (mode === 'vote') renderVote();
-  else if (mode === 'choose') renderChooser();
-  else renderOperator();
-  if (mode !== 'vote') scheduleHostPublish();
+  if (slidesVisible()) renderSlides(mode === 'stage');
+  else {
+    hideSlides();
+    if (mode === 'vote') renderVote();
+    else if (mode === 'choose') renderChooser();
+    else renderOperator();
+  }
+  if (mode !== 'vote' && mode !== 'stage') scheduleHostPublish();
   updateTimers();
 }
 function stageFor(step) {
@@ -1851,7 +2057,7 @@ function renderOperator() {
       '<nav class="rail" aria-label="진행 단계">' + STEPS.map((s, i) => '<button type="button" data-act="step" data-step="' + s.key + '" title="' + s.label + '"' + (s.key === ui.step ? ' aria-current="step"' : '') + '><i>' + (i + 1) + '</i><span>' + s.label + '</span></button>').join('') + '</nav>' +
       '<div class="tools"><span class="mini-timer" data-timer="*" hidden></span><span class="status" data-dyn="status"></span>' +
       '<button type="button" class="icon-btn optool" data-act="sound" data-dyn="sound"></button>' +
-      '<button type="button" class="icon-btn optool" data-act="present">발표 모드</button><button type="button" class="icon-btn optool" data-act="settings">설정</button></div></div></header>' +
+      '<button type="button" class="icon-btn optool" data-act="slides" title="무대용 슬라이드 (P)">슬라이드</button>' + (IN_CLAUDE ? '' : '<button type="button" class="icon-btn optool" data-act="stage-window" title="프로젝터에 띄울 창을 따로 열어요">무대 창</button>') + '<button type="button" class="icon-btn optool" data-act="settings">설정</button></div></div></header>' +
       '<main class="wrap gutter"><div class="banner-wrap" data-dyn="banner"></div><div id="stage" class="stage"></div>' +
       (panel ? '<section class="panel op" id="panel">' + panel + '</section>' : '') +
       '<p class="hint op" style="margin-top:1.6rem">선생님은 조 편성·투표 단계의 QR로 선생님 화면을 열어요. <button type="button" class="linkish" data-act="go-vote">이 기기에서 선생님 화면 보기</button></p></main>' +
@@ -1873,9 +2079,12 @@ function renderOperator() {
   setHtml($('[data-dyn="banner"]'), banner);
   const html = stageFor(ui.step);
   if (html !== lastStageHtml) { $('#stage').innerHTML = html; lastStageHtml = html; }
+  const pill = $('#stage-pill'), ph = stagePillHtml();
+  setHtml(pill, ph); pill.hidden = !ph;
   $$('#panel [data-dyn]').forEach(el => setHtml(el, panelDyn(el.dataset.dyn)));
 }
 function renderChooser() {
+  const pill = $('#stage-pill'); if (pill) pill.hidden = true;
   if (built !== 'choose') {
     $('#app').innerHTML = '<div class="vapp gutter"><div class="vhead"><div class="brand"><b data-dyn="brand"></b><small>까나페 대회</small></div></div>' +
       (IN_CLAUDE ? '<div class="vcard"><h1>어떤 화면을 열까요?</h1><button type="button" class="btn big" data-act="go-vote">선생님 화면 (우리 조 · 투표)</button>' : '<div class="vcard"><h1>선생님이세요?</h1><p>진행 화면에 나온 QR을 휴대폰 카메라로 찍으면 선생님 화면이 열려요.</p>') +
@@ -1942,6 +2151,7 @@ function voteHtml(t) {
     (IN_CLAUDE ? '<p class="hint"><button type="button" class="linkish" data-act="go-ops">진행 화면으로</button></p>' : '') + '</div>';
 }
 function renderVote() {
+  const pill = $('#stage-pill'); if (pill) pill.hidden = true;
   const t = TEAMS.indexOf(Number(ui.vteam)) >= 0 ? Number(ui.vteam) : 0;
   const key = 'vote:' + t;
   if (built !== key) {
@@ -2072,11 +2282,305 @@ async function saveCanape(t) {
   updateVoteDynamic(t);
 }
 
+/* ---------- stage slides ---------- */
+const SLIDES = [
+  {key: 'cover', step: 'register', label: '표지'},
+  {key: 'rules', step: 'register', label: '오늘의 순서'},
+  {key: 'register', step: 'register', label: '도착'},
+  {key: 'teams', step: 'teams', label: '조 편성'},
+  {key: 'plan', step: 'plan', label: '기획 회의', timer: 'plan'},
+  {key: 'menu', step: 'plan', label: '오늘의 재료'},
+  {key: 'draft', step: 'draft', label: '재료 수령'},
+  {key: 'make', step: 'make', label: '까나페 제작', timer: 'make'},
+  {key: 'taste', step: 'taste', label: '시식', timer: 'taste'},
+  {key: 'vote', step: 'vote', label: '투표', timer: 'vote'},
+  {key: 'reveal', step: 'reveal', label: 'Top3 발표'},
+  {key: 'winners', step: 'winners', label: 'Top3 명단'},
+  {key: 'thanks', step: 'winners', label: '마무리'}
+];
+const PRIMARY_SLIDE = {register: 'register', teams: 'teams', plan: 'plan', draft: 'draft', make: 'make', taste: 'taste', vote: 'vote', reveal: 'reveal', winners: 'winners'};
+const slideMeta = k => SLIDES.find(s => s.key === k) || SLIDES[0];
+function stageSlide() { const k = (S.state.stage || {}).slide; return SLIDES.some(s => s.key === k) ? k : 'cover'; }
+function slidesVisible() { const m = currentMode(); return m === 'stage' || (m === 'operator' && ui.slideMode); }
+function setSlide(key) {
+  if (!SLIDES.some(s => s.key === key) || ui.stageView) return;
+  if (key !== stageSlide()) writeState({stage: {slide: key, at: Date.now()}});
+  const step = slideMeta(key).step;
+  if (step !== ui.step) { ui.step = step; ls.set('kc-step', step); built = null; }
+}
+// The stage follows the step the operator is working on, unless it already shows a slide of that step.
+function syncStageToStep(step) {
+  if (ui.stageView || readOnly || revoked || !db) return;
+  if (slideMeta(stageSlide()).step !== step && PRIMARY_SLIDE[step]) writeState({stage: {slide: PRIMARY_SLIDE[step], at: Date.now()}});
+}
+function slideNext() {
+  const k = stageSlide();
+  if (k === 'reveal' && votedCount()) {
+    const g = revealGroups(resultsNow()).length, st = Number(S.state.reveal.step) || 0;
+    if (st < g + 1) { revealMove(1); return; }
+  }
+  const i = SLIDES.findIndex(s => s.key === k);
+  if (i < SLIDES.length - 1) setSlide(SLIDES[i + 1].key);
+}
+function slidePrev() {
+  const k = stageSlide();
+  if (k === 'reveal' && (Number(S.state.reveal.step) || 0) > 0) { revealMove(-1); return; }
+  const i = SLIDES.findIndex(s => s.key === k);
+  if (i > 0) setSlide(SLIDES[i - 1].key);
+}
+function enterSlides() {
+  ui.slideMode = true;
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  if (slideMeta(stageSlide()).step !== ui.step && PRIMARY_SLIDE[ui.step]) writeState({stage: {slide: PRIMARY_SLIDE[ui.step], at: Date.now()}});
+  try { if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); } catch (e) { /* not allowed here */ }
+  showCtrl();
+  scheduleRender();
+}
+function exitSlides() {
+  ui.slideMode = false;
+  built = null;
+  try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) { /* ignore */ }
+  scheduleRender();
+}
+function openStageWindow() {
+  const url = location.href.split('#')[0] + '#stage';
+  let w = null;
+  try { w = window.open(url, 'kc-stage', 'popup,width=1280,height=720'); } catch (e) { w = null; }
+  if (w) toast('무대 창을 프로젝터 화면으로 옮긴 뒤 그 창을 누르고 F를 누르세요');
+  else toast('새 창이 막혔어요. 주소 끝에 #stage를 붙여 새 창에서 열어 주세요', 'bad');
+}
+
+/* slide pieces */
+function slTimer(key) {
+  return '<div class="sl-timer" data-timer-card="' + key + '"><span class="sl-tlabel">' + TIMERS[key].label + ' · ' + Math.round(timerRemaining(key).total / 60000) + '분</span>' +
+    '<div class="sl-digits num" data-timer="' + key + '"></div><div class="sl-bar"><i data-timer-bar="' + key + '"></i></div></div>';
+}
+function plateSvg() {
+  const spots = [[205, 214, -8], [322, 196, 5], [440, 214, -4], [262, 290, 7], [384, 292, -6], [500, 280, 9]];
+  return '<svg class="sl-plate" viewBox="0 0 720 420" aria-hidden="true">' +
+    '<ellipse cx="350" cy="262" rx="330" ry="132" style="fill:var(--sl-card);stroke:var(--sl-line);stroke-width:5"/>' +
+    '<ellipse cx="350" cy="262" rx="250" ry="92" style="fill:none;stroke:var(--sl-line);stroke-width:3"/>' +
+    spots.map((p, i) => '<g transform="translate(' + p[0] + ' ' + p[1] + ') rotate(' + p[2] + ')">' +
+      '<rect x="-46" y="-30" width="92" height="60" rx="16" style="fill:var(--sl-cracker);stroke:var(--sl-cracker-edge);stroke-width:4"/>' +
+      '<circle cx="0" cy="-12" r="27" style="fill:var(--t' + (i + 1) + ')"/><circle cx="-8" cy="-21" r="6" style="fill:var(--sl-card);opacity:.7"/></g>').join('') + '</svg>';
+}
+function slCover() {
+  return '<div class="sl-cover"><div><p class="sl-kicker">소년부 요리 대회</p><h1 class="sl-title">' + esc(S.config.eventName) + '</h1><p class="sl-sub">친구를 위해 만드는 한 입 요리</p></div>' + plateSvg() + '</div>';
+}
+function slRules() {
+  const steps = [['조 편성', '랜덤으로 6개 조'], ['기획 회의', '5분 · 이름과 재료 정하기'], ['재료 수령', '가위바위보 순서, 지그재그'], ['까나페 제작', '10분 · 다른 조 몫 만들기'], ['시식 · 투표', '맛보고 1·2·3위 고르기'], ['Top3 발표', '두구두구!']];
+  return '<h2 class="sl-h">오늘의 순서</h2><ol class="sl-steps">' + steps.map((s, i) => '<li class="t' + (i + 1) + '"><b>' + (i + 1) + '</b><span>' + s[0] + '</span><small>' + s[1] + '</small></li>').join('') + '</ol>' +
+    '<div class="sl-rule"><span>특별 규칙</span><b>우리 조 까나페는 다른 조 친구들이 먹어요</b><small>1위 5점 · 2위 3점 · 3위 1점 · 우리 조는 못 골라요</small></div>';
+}
+function slRegister() {
+  const list = kids(), n = list.length;
+  const known = ui.slKnown || (ui.slKnown = new Set(list.map(k => k.id)));
+  const shown = list.slice(-60);
+  const cols = shown.length > 45 ? 6 : 5, fs = shown.length > 48 ? 30 : (shown.length > 35 ? 36 : 42);
+  const html = '<div class="sl-reg"><div class="sl-count"><b class="num">' + n + '</b><span>명 도착</span><small>' + (n ? '6개 조로 나누면 ' + sizeSummary(n) : '이름을 등록하면 여기에 나와요') + '</small></div>' +
+    '<ol class="sl-names" style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr));font-size:' + fs + 'px">' + shown.map(k => '<li' + (known.has(k.id) ? '' : ' class="fresh"') + '>' + esc(k.name) + '</li>').join('') + '</ol></div>';
+  list.forEach(k => known.add(k.id));
+  return html;
+}
+function slTeams() {
+  const list = kids();
+  if (!formed() && !ui.animating) return '<div class="sl-center"><h2 class="sl-h">곧 조 편성이 시작돼요!</h2><p class="sl-sub">' + list.length + '명 · ' + (sizeSummary(list.length) || '아직 등록 전') + '</p></div>';
+  const sz = countBy(ui.tempAssign || S.teams.assign, list.map(k => k.id));
+  return '<div class="sl-tickets">' + TEAMS.map(t => {
+    const tch = ui.tempAssign ? [] : teamTeachers(t);
+    return '<article class="sl-ticket t' + t + '"><header><b>' + t + '조</b><span>' + (tch.length ? esc(tch.map(x => x.name).join(', ')) + ' 선생님' : COLOR_NAMES[t]) + '</span><em class="num">' + sz[t] + '명</em></header>' +
+      (canapeName(t) && !ui.tempAssign ? '<p class="sl-cname">“' + esc(canapeName(t)) + '”</p>' : '') +
+      '<ul>' + members(t).map(k => '<li>' + esc(k.name) + '</li>').join('') + '</ul></article>';
+  }).join('') + '</div>';
+}
+function slPlan() {
+  return '<div class="sl-split">' + slTimer('plan') + '<div class="sl-list"><h3>기획서에 쓸 것</h3><ul class="sl-todo"><li>까나페 이름</li><li>재료 1지망 · 2지망</li><li>역할 나누기</li><li>조 대표 1명</li></ul>' +
+    '<p class="sl-note">★ 재료는 딱 1세트! 먼저 고른 조만 가져가요</p></div></div>';
+}
+function slMenu() {
+  const counts = pickCounts(S.config.draftMode);
+  const rem = S.state.picks.length ? remainingSets(S.config.ingredients, S.state.picks) : null;
+  return '<div class="sl-menu">' + CAT_KEYS.map(cat => '<section><h3>' + CATS[cat] + '<small>조마다 ' + counts[cat] + '개</small></h3><ul>' +
+    (S.config.ingredients[cat] || []).map(it => {
+      const left = rem ? rem[ingKey(cat, it.name)] : it.sets;
+      return '<li class="' + (it.sets === 1 ? 'limited' : '') + (rem && left === 0 ? ' out' : '') + '"><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><span class="sets">' + (rem ? left + '/' + it.sets : it.sets + '세트') + '</span></li>';
+    }).join('') + '</ul></section>').join('') + '</div>';
+}
+function slDraft() {
+  const rps = S.state.rps;
+  if (rps.length < TEAM_COUNT) {
+    return '<h2 class="sl-h">가위바위보로 순서를 정해요</h2><ol class="sl-rps">' + [0, 1, 2, 3, 4, 5].map(i => rps[i]
+      ? '<li class="on t' + rps[i] + '"><b>' + CIRC[i] + '</b><span>' + rps[i] + '조</span></li>'
+      : '<li><b>' + CIRC[i] + '</b><span class="muted">?</span></li>').join('') + '</ol><p class="sl-sub">1:1 세 판 → 이긴 3명끼리 → 진 3명끼리</p>';
+  }
+  const seq = draftSequence(rps, S.config.draftMode), picks = S.state.picks, idx = picks.length;
+  let top;
+  if (idx < seq.length) {
+    const cur = seq[idx], rem = remainingSets(S.config.ingredients, picks);
+    const have = teamPicks(picks, cur.team).filter(p => p.cat === cur.cat).map(p => p.name);
+    top = '<div class="sl-now t' + cur.team + '"><div><span>지금 고를 차례 · ' + (idx + 1) + '/' + seq.length + '</span><b>' + CIRC[cur.slot - 1] + ' ' + cur.team + '조</b></div><em>' + CATS[cur.cat] + ' ' + catOrdinal(S.config.draftMode, cur.round) + '</em></div>' +
+      '<div class="sl-ings">' + (S.config.ingredients[cur.cat] || []).map(it => {
+        const left = rem[ingKey(cur.cat, it.name)], out = left <= 0 || have.indexOf(it.name) >= 0;
+        return '<button type="button" class="sl-ing' + (out ? ' out' : '') + '" data-act="pick" data-name="' + esc(it.name) + '"' + (out || ui.stageView ? ' disabled' : '') + '><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><small>' + left + '/' + it.sets + '</small></button>';
+      }).join('') + '</div>';
+  } else {
+    top = '<div class="sl-now"><div><span>재료 수령 끝</span><b>이제 만들 시간!</b></div></div>';
+  }
+  return top + '<div class="sl-picks">' + TEAMS.map(t => '<div class="t' + t + '"><b>' + t + '조</b><span>' + (teamPicks(picks, t).map(p => esc(p.name)).join(' · ') || '아직 없음') + '</span></div>').join('') + '</div>';
+}
+function slMake() {
+  const orders = formed() ? computeTargets(sizes()) : [];
+  return '<div class="sl-make">' + slTimer('make') + (orders.length ? '<div class="sl-orders">' + orders.map(o =>
+    '<div class="sl-order t' + o.team + '"><header>' + o.team + '조</header><b class="num">' + o.target + '<small>개</small></b><p>' + o.plates.map(p => p.to + '조 ' + p.count).join(' · ') + '</p></div>').join('') + '</div>'
+    : '<p class="sl-sub">조 편성 뒤에 조별 목표가 나와요</p>') + '</div>';
+}
+function slTaste() {
+  return '<div class="sl-split">' + slTimer('taste') + '<ol class="sl-rules"><li><span><b>접시마다 1개씩</b>, 다섯 개를 다 맛봐요</span></li><li><span><b>한 입 먹고 물 한 모금</b></span></li><li><span><b>알레르기</b> 접시는 건너뛰어요</span></li><li><span>다 먹고 나서 <b>1·2·3위</b>를 정해요</span></li></ol></div>';
+}
+function slVote() {
+  const url = voteLink(), open = !!S.state.voting.open;
+  return '<div class="sl-vote"><div class="sl-qr">' + (url ? '<div class="qr-tile">' + qrSvg(url) + '</div>' : '') + '<p>선생님 폰 카메라로 찍어 주세요</p></div>' +
+    '<div class="sl-vright"><h2 class="sl-h">' + (open ? '투표 중!' : '곧 투표해요') + '</h2><p class="sl-sub">1위 5점 · 2위 3점 · 3위 1점 · 우리 조는 못 골라요</p>' + slTimer('vote') +
+    '<ul class="sl-vstatus">' + TEAMS.map(t => { const ok = validBallot(S.votes[t], t); return '<li class="t' + t + (ok ? ' done' : '') + '"><b>' + t + '조</b><span>' + (ok ? '제출 ✓' : '기다리는 중') + '</span></li>'; }).join('') + '</ul></div></div>';
+}
+function slResultCard(r, label, big, animate) {
+  const quotes = r.comments.filter(q => !S.state.hidden[q.from + '-' + r.team]).slice(0, big ? 3 : 2);
+  return '<article class="sl-rcard t' + r.team + (animate ? ' new' : '') + '"><header><span class="place">' + label + '</span><span class="team">' + r.team + '조</span><span class="score num">' + r.score + '<small>점</small></span></header>' +
+    (canapeName(r.team) ? '<div class="cn">“' + esc(canapeName(r.team)) + '”</div>' : '') +
+    '<ul class="sl-quotes">' + quotes.map(q => '<li>' + esc(String(q.text).slice(0, 80)) + '<cite>' + q.from + '조가 남긴 시식평</cite></li>').join('') + '</ul></article>';
+}
+function slReveal() {
+  const res = resultsNow(), groups = revealGroups(res), n = votedCount();
+  const step = Math.max(0, Math.min(Number(S.state.reveal.step) || 0, groups.length + 1));
+  const animate = ui.slReveal !== undefined && ui.slReveal !== step;
+  ui.slReveal = step;
+  if (!n) return '<div class="sl-center"><h2 class="sl-h">투표를 모으는 중이에요</h2></div>';
+  if (step === 0) return '<div class="sl-center"><h2 class="sl-h sl-drum">두구두구…</h2><p class="sl-sub">' + n + '개 조가 투표했어요. 3위부터 발표해요!</p></div>';
+  if (step <= groups.length) {
+    const g = groups[step - 1];
+    if (animate && g.rank === 1) setTimeout(confetti, 300);
+    return '<div class="sl-reveal' + (g.teams.length > 1 ? ' multi' : '') + '">' + g.teams.map(r => slResultCard(r, groupLabel(g), true, animate)).join('') + '</div>';
+  }
+  const by = {};
+  groups.forEach(g => { by[g.rank] = g; });
+  return '<h2 class="sl-h">오늘의 Top3</h2><div class="sl-podium">' + [2, 1, 3].map(rk => {
+    const g = by[rk];
+    return '<div class="sl-pcol p' + rk + '">' + (g ? g.teams.map(r => '<div class="sl-pcard t' + r.team + '"><header><b>' + r.team + '조</b><span class="num">' + r.score + '점</span></header>' + (canapeName(r.team) ? '<p>“' + esc(canapeName(r.team)) + '”</p>' : '') + '</div>').join('') : '') +
+      '<div class="sl-pstep">' + (g ? groupLabel(g) : '') + '</div></div>';
+  }).join('') + '</div>';
+}
+function slWinners() {
+  const top = resultsNow().filter(r => r.rank <= 3 && r.score > 0);
+  if (!top.length) return '<div class="sl-center"><h2 class="sl-h">곧 Top3 명단이 나와요</h2></div>';
+  return '<h2 class="sl-h">이름이 불리면 앞으로 나와요!</h2><div class="sl-winners" style="grid-template-columns:repeat(' + top.length + ',minmax(0,1fr))">' + top.map(r => {
+    const mem = members(r.team);
+    return '<article class="sl-wcard t' + r.team + '"><header><b>' + r.rank + '위</b><span>' + r.team + '조 · ' + r.score + '점</span></header><ul style="--cols:' + (mem.length > 8 ? 2 : 1) + '">' +
+      (mem.length ? mem.map(k => '<li>' + esc(k.name) + '</li>').join('') : '<li class="muted">명단 없음</li>') + '</ul></article>';
+  }).join('') + '</div>';
+}
+function slThanks() {
+  return '<div class="sl-center"><h2 class="sl-h">오늘 모두가 셰프였어요!</h2><p class="sl-sub">남은 재료로 우리 조 까나페를 만들어 먹고, 다 같이 정리해요</p></div>';
+}
+function slideInner(k) {
+  switch (k) {
+    case 'cover': return slCover();
+    case 'rules': return slRules();
+    case 'register': return slRegister();
+    case 'teams': return slTeams();
+    case 'plan': return slPlan();
+    case 'menu': return slMenu();
+    case 'draft': return slDraft();
+    case 'make': return slMake();
+    case 'taste': return slTaste();
+    case 'vote': return slVote();
+    case 'reveal': return slReveal();
+    case 'winners': return slWinners();
+    case 'thanks': return slThanks();
+  }
+  return '';
+}
+
+/* deck chrome */
+let lastSlideHtml = '', ctrlT = null;
+function fitDeck() {
+  const el = $('#slide');
+  if (el) el.style.transform = 'translate(-50%,-50%) scale(' + Math.min(innerWidth / 1920, innerHeight / 1080) + ')';
+}
+function showCtrl() {
+  const deck = $('#deck');
+  if (!deck || ui.stageView) return;
+  deck.classList.add('show-ctrl');
+  clearTimeout(ctrlT);
+  ctrlT = setTimeout(() => { const c = $('.sl-ctrl'); if (!(c && c.matches(':hover')) && !(c && c.contains(document.activeElement))) deck.classList.remove('show-ctrl'); else showCtrl(); }, 2600);
+}
+function ctrlHtml(k) {
+  const i = SLIDES.findIndex(s => s.key === k), meta = SLIDES[i];
+  const parts = ['<button type="button" class="icon-btn" data-act="sl-prev">◀ 이전</button>',
+    '<select id="sl-jump" aria-label="슬라이드로 가기">' + SLIDES.map((s, j) => '<option value="' + s.key + '"' + (s.key === k ? ' selected' : '') + '>' + (j + 1) + '. ' + s.label + '</option>').join('') + '</select>',
+    '<button type="button" class="icon-btn" data-act="sl-next">다음 ▶</button>', '<span class="sep"></span>'];
+  if (meta.timer) {
+    const r = timerRemaining(meta.timer);
+    parts.push('<button type="button" class="icon-btn" data-act="sl-timer">' + (r.running && r.ms > 0 ? '타이머 멈춤 (T)' : '타이머 시작 (T)') + '</button><button type="button" class="icon-btn" data-act="timer-plus" data-key="' + meta.timer + '">+1분</button><button type="button" class="icon-btn" data-act="timer-reset" data-key="' + meta.timer + '">처음으로</button>');
+  }
+  if (k === 'teams' && !formed()) parts.push('<button type="button" class="icon-btn" data-act="form-teams">조 편성 시작</button>');
+  if (k === 'vote') parts.push(S.state.voting.open ? '<button type="button" class="icon-btn" data-act="vote-close">투표 마감</button>' : '<button type="button" class="icon-btn" data-act="vote-open">투표 열기</button>');
+  if (k === 'draft') {
+    if (S.state.rps.length < TEAM_COUNT) parts.push(TEAMS.map(t => '<button type="button" class="team-mini t' + t + '" data-act="rps-add" data-team="' + t + '"' + (S.state.rps.indexOf(t) >= 0 ? ' disabled' : '') + '>' + t + '조</button>').join('') + '<button type="button" class="icon-btn" data-act="rps-undo">되돌리기</button>');
+    else parts.push('<button type="button" class="icon-btn" data-act="pick-undo">되돌리기</button><button type="button" class="icon-btn" data-act="pick-skip">건너뛰기</button>');
+  }
+  parts.push('<span class="sep"></span><button type="button" class="icon-btn" data-act="sl-blank">' + ((S.state.stage || {}).blank ? '화면 보이기 (B)' : '화면 가리기 (B)') + '</button>',
+    '<button type="button" class="icon-btn" data-act="sl-look">' + ((S.state.stage || {}).look === 'dark' ? '밝게' : '어둡게') + '</button>',
+    '<button type="button" class="icon-btn" data-act="fullscreen">전체 화면 (F)</button>',
+    (IN_CLAUDE ? '' : '<button type="button" class="icon-btn" data-act="stage-window">무대 창</button>'),
+    '<button type="button" class="icon-btn" data-act="slides-exit">진행 화면 (Esc)</button>');
+  return parts.join('');
+}
+function renderSlides(stageView) {
+  const deck = $('#deck');
+  deck.hidden = false;
+  document.documentElement.classList.add('deck-on');
+  const st = S.state.stage || {};
+  deck.dataset.look = st.look === 'dark' ? 'dark' : 'light';
+  $('#sl-blank').hidden = !st.blank;
+  const k = stageSlide();
+  if (stageView) {
+    // a separate stage window plays its own shuffle when the operator forms teams
+    const f = S.teams.formedAt || null;
+    if (ui.slFormed !== undefined && f && f !== ui.slFormed && k === 'teams' && !ui.animating && !prefersReduced()) {
+      ui.slFormed = f;
+      shuffleAnimation(kids()).then(() => { ui.tempAssign = null; ui.animating = false; scheduleRender(); });
+      return;
+    }
+    ui.slFormed = f;
+  }
+  const i = SLIDES.findIndex(s => s.key === k);
+  const html = '<div class="sl-top"><span>' + esc(S.config.eventName) + '</span><span class="sl-step"><i>' + (i + 1) + '/' + SLIDES.length + '</i>' + esc(SLIDES[i].label) + '</span></div>' +
+    '<div class="sl-body">' + slideInner(k) + '</div><div class="sl-foot" aria-hidden="true">' + TEAMS.map(t => '<i class="t' + t + '"></i>').join('') + '</div>';
+  if (html !== lastSlideHtml) { $('#slide').innerHTML = html; lastSlideHtml = html; }
+  fitDeck();
+  const ctrl = $('.sl-ctrl');
+  if (stageView) ctrl.hidden = true;
+  else { ctrl.hidden = false; setHtml(ctrl, ctrlHtml(k)); }
+}
+function hideSlides() {
+  const deck = $('#deck');
+  if (deck && !deck.hidden) { deck.hidden = true; document.documentElement.classList.remove('deck-on'); lastSlideHtml = ''; }
+}
+function stagePillHtml() {
+  if (IN_CLAUDE || !HOST.stageSeen || Date.now() - HOST.stageSeen > 10000) return '';
+  const k = stageSlide(), i = SLIDES.findIndex(s => s.key === k);
+  return '<span>무대</span><button type="button" class="icon-btn" data-act="sl-prev" aria-label="무대 이전 슬라이드">◀</button><span class="lbl">' + (i + 1) + '. ' + esc(SLIDES[i].label) + '</span>' +
+    '<button type="button" class="icon-btn" data-act="sl-next" aria-label="무대 다음 슬라이드">▶</button><button type="button" class="icon-btn" data-act="sl-blank">' + ((S.state.stage || {}).blank ? '보이기' : '가리기') + '</button>';
+}
+window.addEventListener('resize', fitDeck);
+['mousemove', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { if (ui.slideMode) showCtrl(); }, {passive: true}));
+
 /* ---------- events ---------- */
 function go(step) {
   if (!step || step === ui.step) return;
   ui.step = step; ui.moveKid = null;
   ls.set('kc-step', step);
+  syncStageToStep(step);
   built = null;
   scheduleRender();
   window.scrollTo(0, 0);
@@ -2096,7 +2600,14 @@ document.addEventListener('click', e => {
     case 'step': go(d.step); break;
     case 'prev': go(stepOffset(-1)); break;
     case 'next': go(stepOffset(1)); break;
-    case 'present': ui.present = !ui.present; scheduleRender(); break;
+    case 'present': case 'slides': enterSlides(); break;
+    case 'slides-exit': exitSlides(); break;
+    case 'stage-window': openStageWindow(); break;
+    case 'sl-next': slideNext(); break;
+    case 'sl-prev': slidePrev(); break;
+    case 'sl-blank': writeState({stage: {blank: !(S.state.stage || {}).blank}}); break;
+    case 'sl-look': writeState({stage: {look: (S.state.stage || {}).look === 'dark' ? 'light' : 'dark'}}); break;
+    case 'sl-timer': { const m = slideMeta(stageSlide()); if (m.timer) { const r = timerRemaining(m.timer); if (r.running && r.ms > 0) timerPause(); else timerStart(m.timer); } break; }
     case 'fullscreen': toggleFullscreen(); break;
     case 'sound': ui.sound = !ui.sound; ls.set('kc-sound', ui.sound); if (ui.sound) chime([880], 0.12); scheduleRender(); break;
     case 'settings': openSettings(); break;
@@ -2170,6 +2681,17 @@ document.addEventListener('compositionend', e => {
   }
 });
 document.addEventListener('keydown', e => {
+  if (slidesVisible()) {
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    if (e.code === 'KeyF') { e.preventDefault(); toggleFullscreen(); return; }
+    if (currentMode() === 'stage' || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', 'Space', 'Enter', 'KeyN'].indexOf(e.code) >= 0) { e.preventDefault(); slideNext(); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].indexOf(e.code) >= 0) { e.preventDefault(); slidePrev(); }
+    else if (e.code === 'KeyB' || e.code === 'Period') { e.preventDefault(); writeState({stage: {blank: !(S.state.stage || {}).blank}}); }
+    else if (e.code === 'KeyT') { const m = slideMeta(stageSlide()); if (m.timer) { const r = timerRemaining(m.timer); if (r.running && r.ms > 0) timerPause(); else timerStart(m.timer); } }
+    else if (e.key === 'Escape') exitSlides();
+    return;
+  }
   if (e.key === 'Enter' && e.target.matches && e.target.matches(ENTER_FIELDS)) {
     e.preventDefault();
     const f = e.target.closest('[data-form]').dataset.form;
@@ -2190,7 +2712,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { e.preventDefault(); go(stepOffset(1)); }
   else if (e.key === 'ArrowLeft') { e.preventDefault(); go(stepOffset(-1)); }
   else if (e.code === 'Space') { if (!readOnly && timerToggleCurrent()) e.preventDefault(); }
-  else if (e.code === 'KeyP') { ui.present = !ui.present; scheduleRender(); }
+  else if (e.code === 'KeyP') enterSlides();
   else if (e.code === 'KeyF') toggleFullscreen();
 });
 document.addEventListener('input', e => {
@@ -2203,10 +2725,11 @@ document.addEventListener('input', e => {
   }
 });
 document.addEventListener('pointerdown', () => { if (currentMode() === 'operator' && ui.sound) audio(); }, {passive: true});
-const BOOT_KIND = location.hash.indexOf('#vote') === 0 ? 'vote' : 'host';
+const kindOf = h => h.indexOf('#vote') === 0 ? 'vote' : (h === '#stage' ? 'stage' : 'host');
+const BOOT_KIND = kindOf(location.hash);
 window.addEventListener('hashchange', () => {
-  // Outside Claude the page sets itself up as either the laptop or a phone, so switching needs a fresh start.
-  if (!IN_CLAUDE && (location.hash.indexOf('#vote') === 0 ? 'vote' : 'host') !== BOOT_KIND) { location.reload(); return; }
+  // The page sets itself up as the laptop, a phone or a stage window, so switching needs a fresh start.
+  if (kindOf(location.hash) !== BOOT_KIND && (!IN_CLAUDE || BOOT_KIND === 'stage' || kindOf(location.hash) === 'stage')) { location.reload(); return; }
   built = null; scheduleRender();
 });
 if (window.matchMedia) {
@@ -2216,6 +2739,15 @@ if (window.matchMedia) {
 }
 
 /* ---------- start ---------- */
+if (BOOT_KIND === 'stage') {
+  ui.stageView = true;
+  const hint = $('#sl-hint');
+  hint.textContent = '무대 창이에요. 진행 화면을 따라가요. 이 창을 누르고 F를 누르면 전체 화면이 돼요.';
+  hint.hidden = false;
+  setTimeout(() => { hint.hidden = true; }, 6000);
+  document.addEventListener('dblclick', toggleFullscreen);
+}
+document.addEventListener('change', e => { if (e.target && e.target.id === 'sl-jump') { setSlide(e.target.value); e.target.blur(); } });
 render();
 setInterval(updateTimers, 200);
 loadQr();
