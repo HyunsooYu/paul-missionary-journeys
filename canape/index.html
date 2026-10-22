@@ -325,15 +325,64 @@ body.present .pres-bar{display:flex}
 .sheet{width:min(34rem,100%);height:100%;overflow:auto;background:var(--bg);padding:calc(1.1rem + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(1.2rem + env(safe-area-inset-bottom,0px)) 16px;display:flex;flex-direction:column;gap:1rem}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:45}
 
+/* seat map, ingredient board, allergy notes, done, rewards */
+.room{display:block;width:100%;height:auto;max-width:100%}
+.room-floor{fill:var(--surface);stroke:var(--line);stroke-width:4}
+.room-stage{fill:var(--sunk);stroke:var(--line);stroke-width:3}
+.room-pew{fill:var(--sunk)}
+.room-pill{fill:var(--surface)}
+.room-window{fill:var(--t5);opacity:.45}
+.room-label{fill:var(--muted);font-family:var(--body);font-size:40px;font-weight:700}
+.room-label.sm{font-size:32px}
+.room-table rect{fill:var(--tc)}
+.room-table text{fill:var(--on);font-family:var(--body);font-weight:700}
+.room-table .tno{font-family:var(--display);font-weight:400;font-size:62px}
+.room-table .tsub{font-size:27px}
+.room-table.dim{opacity:.25}
+.room-table.me rect{stroke:var(--ink);stroke-width:10}
+.room.compact .room-table .tno{font-size:88px}
+.room.compact .room-label{font-size:58px}
+.room.compact .room-label.sm{font-size:48px}
+.room-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:1rem;display:flex;flex-direction:column;gap:.6rem;min-width:0}
+.room-card .room{max-width:62rem;margin:0 auto}
+.common-strip{display:flex;flex-wrap:wrap;gap:.5rem}
+.common-strip span{background:var(--surface);border:1.5px dashed var(--line);border-radius:12px;padding:.45rem .8rem;font-weight:600}
+.menu{grid-template-columns:repeat(var(--cols,3),minmax(0,1fr))}
+@media (max-width:1000px){.menu{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.menu{grid-template-columns:1fr}}
+.menu li .tags{display:block;font-size:.72rem;color:var(--muted);font-weight:500}
+.warn{font-style:normal;display:inline-flex;align-items:center;margin:0 .35rem;padding:0 .4rem;border-radius:999px;background:var(--bad-soft);color:var(--bad);font-size:.75rem;font-weight:800;white-space:nowrap;vertical-align:middle}
+.warn-list{list-style:none;margin:0;padding:.7rem .9rem;border-radius:12px;background:var(--bad-soft);display:flex;flex-direction:column;gap:.3rem;font-size:.92rem}
+.alert-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
+.alert-list li{display:flex;flex-wrap:wrap;gap:.25rem .5rem;align-items:baseline;background:var(--bad-soft);border-radius:10px;padding:.5rem .7rem}
+.alert-list .skip{flex-basis:100%;font-weight:700;color:var(--bad)}
+.order.done{box-shadow:0 0 0 3px var(--tc),var(--shadow)}
+.done-badge{font-family:var(--body);font-size:.9rem;background:var(--surface);color:var(--ink);border-radius:999px;padding:.1rem .6rem;white-space:nowrap}
+.done-row{padding:0 1rem 1rem}
+.reward{margin:.6rem 1.2rem 0;align-self:flex-start;background:var(--warn-soft);color:var(--ink);border-radius:999px;padding:.2rem .8rem;font-weight:800}
+.podium .step small{display:block;font-family:var(--body);font-size:.85rem;font-weight:800;color:var(--muted)}
+.kind-row{display:flex;flex-direction:column;gap:.35rem;padding:.6rem 0;border-top:1px dashed var(--line)}
+.kind-row .row{justify-content:space-between}
+.kind-row select{width:auto}
+.seat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}
+@media (max-width:500px){.seat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.seat-line{margin:0 0 .3rem;font-size:.95rem}
+.warn-card{border-color:var(--bad)}
+.vpicks{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.35rem}
+.vpicks li{background:var(--sunk);border-radius:10px;padding:.3rem .6rem;font-weight:700;display:flex;flex-direction:column;line-height:1.25}
+.vpicks small{font-size:.7rem;color:var(--muted)}
+
 /* ---------- stage slides: a 1920×1080 canvas scaled to the screen.
    The stage keeps its own light/dark look (chosen on stage), independent of the device theme. ---------- */
 :root{
   --sl-bg:#F4F7F5;--sl-ink:#132019;--sl-muted:#56645D;--sl-line:#D2DCD6;--sl-card:#FFFFFF;--sl-sunk:#E3EAE5;--sl-edge:#DCE4DF;
   --sl-warn:#B06600;--sl-bad:#C8343A;--sl-cracker:#E8C27C;--sl-cracker-edge:#C3924A;--sl-blank:#000000;
+  --sl-cream:#FFF1C9;--sl-cream-edge:#D9B970;--sl-ham:#F1A3AE;--sl-ham-in:#F8C9CF;--sl-sauce:#C2363C;--sl-gold:#F2C230;--sl-silver:#C9D0D5;--sl-bronze:#D08A4C;--sl-medal-ink:#1E1A12;
 }
 .deck{position:fixed;inset:0;z-index:80;background:var(--sl-edge);overflow:hidden;color-scheme:light}
 .deck[data-look="dark"]{--sl-bg:#0F1513;--sl-ink:#F0F5F1;--sl-muted:#A2AEA7;--sl-line:#2A3530;--sl-card:#18201C;--sl-sunk:#232C27;--sl-edge:#060908;
-  --sl-warn:#F0AE48;--sl-bad:#F27479;--sl-cracker:#C99E5E;--sl-cracker-edge:#9A7034;color-scheme:dark}
+  --sl-warn:#F0AE48;--sl-bad:#F27479;--sl-cracker:#C99E5E;--sl-cracker-edge:#9A7034;
+  --sl-cream:#E6D6A6;--sl-cream-edge:#B39553;--sl-ham:#D98894;--sl-ham-in:#E7A9B2;--sl-sauce:#E0565B;--sl-gold:#E8B923;--sl-silver:#B9C1C7;--sl-bronze:#C27C40;color-scheme:dark}
 html.deck-on,html.deck-on body{overflow:hidden}
 .slide{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%);transform-origin:center center;background:var(--sl-bg);color:var(--sl-ink);font-family:var(--body);display:flex;flex-direction:column;padding:50px 88px 72px;overflow:hidden;word-break:keep-all}
 .sl-top{display:flex;justify-content:space-between;align-items:center;gap:40px;font-size:30px;font-weight:700;color:var(--sl-muted);flex:none;min-height:56px}
@@ -438,7 +487,7 @@ html.deck-on,html.deck-on body{overflow:hidden}
 
 /* making + voting */
 .sl-make{display:grid;grid-template-columns:700px minmax(0,1fr);gap:44px;flex:1;align-items:center}
-.sl-make .sl-digits{font-size:270px}
+.sl-make .sl-digits{font-size:215px}
 .sl-orders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .sl-order{background:var(--sl-card);border:2px solid var(--sl-line);border-radius:24px;overflow:hidden;min-width:0}
 .sl-order header{background:var(--tc);color:var(--on);font-family:var(--display);font-size:44px;padding:8px 22px}
@@ -482,7 +531,7 @@ html.deck-on,html.deck-on body{overflow:hidden}
 .sl-pcard header span{font-size:46px}
 .sl-pcard p{margin:0;padding:14px 28px 20px;font-size:34px;font-weight:700;color:var(--sl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sl-pstep{background:var(--sl-sunk);border-radius:26px 26px 0 0;display:grid;place-items:center;font-family:var(--display);font-size:92px}
-.sl-pcol.p1 .sl-pstep{height:300px}.sl-pcol.p2 .sl-pstep{height:200px}.sl-pcol.p3 .sl-pstep{height:130px}
+.sl-pcol.p1 .sl-pstep{height:320px}.sl-pcol.p2 .sl-pstep{height:240px}.sl-pcol.p3 .sl-pstep{height:180px}
 .sl-winners{display:grid;gap:32px;flex:1;min-height:0}
 .sl-wcard{background:var(--sl-card);border:4px solid var(--tc);border-radius:32px;overflow:hidden;display:flex;flex-direction:column;min-height:0;min-width:0}
 .sl-wcard header{background:var(--tc);color:var(--on);display:flex;align-items:baseline;gap:22px;padding:16px 32px;font-family:var(--display)}
@@ -502,6 +551,58 @@ html.deck-on,html.deck-on body{overflow:hidden}
 .sl-hint{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);padding:.55rem 1rem;border-radius:12px;font-weight:700;z-index:3;font-family:var(--body);font-size:15px;transition:opacity .4s}
 .stage-pill{position:fixed;left:calc(12px + env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:.35rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.3rem .4rem .3rem .85rem;box-shadow:var(--shadow);font-weight:700;font-size:.82rem;max-width:calc(100% - 24px)}
 .stage-pill .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:12rem}
+
+/* about, rewards, seats, common strip, making stamps */
+.sl-about{display:grid;grid-template-columns:700px minmax(0,1fr);gap:70px;align-items:center;flex:1;min-height:0}
+.sl-canape{width:700px;height:auto;display:block}
+.ab-base{fill:var(--sl-cracker);stroke:var(--sl-cracker-edge);stroke-width:5}
+.ab-hole{fill:var(--sl-cracker-edge)}
+.ab-spread{fill:var(--sl-cream);stroke:var(--sl-cream-edge);stroke-width:4}
+.ab-ham{fill:var(--sl-ham)}
+.ab-ham-in{fill:var(--sl-ham-in)}
+.ab-shine{fill:var(--sl-card);opacity:.6}
+.ab-sauce{fill:none;stroke:var(--sl-sauce);stroke-width:16;stroke-linecap:round}
+.sl-about-r{display:flex;flex-direction:column;gap:20px;min-width:0}
+.sl-about-r .sl-h{font-size:96px}
+.sl-about-r .sl-sub{font-size:40px}
+.sl-layers{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.sl-layers li{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:24px;background:var(--sl-card);border:2px solid var(--sl-line);border-radius:24px;padding:12px 26px}
+.sl-layers i{width:56px;height:56px;border-radius:16px;display:block}
+.sl-layers .k-base i{background:var(--sl-cracker);border:4px solid var(--sl-cracker-edge)}
+.sl-layers .k-spread i{background:var(--sl-cream);border:4px solid var(--sl-cream-edge)}
+.sl-layers .k-topping i{background:var(--t4)}
+.sl-layers .k-sauce i{background:var(--sl-sauce)}
+.sl-layers .k-seasoning i{background:var(--t3);border:5px dotted var(--sl-ink)}
+.sl-layers b{font-family:var(--display);font-weight:400;font-size:50px;line-height:1.1;display:block}
+.sl-layers small{font-size:28px;font-weight:600;color:var(--sl-muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-layers em{font-style:normal;font-size:28px;font-weight:700;color:var(--sl-muted);white-space:nowrap}
+.sl-medals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:60px;justify-items:center;align-items:center;flex:1}
+.sl-medal{width:400px;height:400px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--sl-medal-ink);box-shadow:inset 0 -16px 0 rgba(0,0,0,.12)}
+.sl-medal.m1{background:var(--sl-gold)}.sl-medal.m2{background:var(--sl-silver)}.sl-medal.m3{background:var(--sl-bronze)}
+.sl-medal b{font-family:var(--display);font-weight:400;font-size:120px;line-height:1}
+.sl-medal span{font-family:var(--display);font-size:62px;line-height:1.1;text-align:center;padding:0 34px}
+.sl-medals + .sl-sub{text-align:center}
+.sl-roomwrap{flex:1;min-height:0;display:flex;justify-content:center}
+.sl-roomwrap .room{width:100%;height:100%}
+.slide .room-floor{fill:var(--sl-card);stroke:var(--sl-line)}
+.slide .room-stage{fill:var(--sl-sunk);stroke:var(--sl-line)}
+.slide .room-pew{fill:var(--sl-sunk)}
+.slide .room-pill{fill:var(--sl-card)}
+.slide .room-label{fill:var(--sl-muted)}
+.sl-common{display:flex;flex-wrap:wrap;gap:16px}
+.sl-common span{background:var(--sl-card);border:3px dashed var(--sl-line);border-radius:22px;padding:10px 26px;font-size:34px;font-weight:700}
+.sl-common b{font-family:var(--display);font-weight:400;margin-right:10px}
+.sl-order{position:relative}
+.sl-order.done{box-shadow:0 0 0 5px var(--tc)}
+.sl-stamp{position:absolute;right:16px;top:58px;transform:rotate(-8deg);background:var(--sl-ink);color:var(--sl-bg);border-radius:18px;padding:8px 18px;font-family:var(--display);font-size:44px;line-height:1.05;text-align:center;display:flex;flex-direction:column}
+.sl-stamp small{font-family:var(--body);font-size:22px;font-weight:700;opacity:.85}
+.sl-stamp.new{animation:stamp .6s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes stamp{0%{transform:rotate(-8deg) scale(2.4);opacity:0}100%{transform:rotate(-8deg) scale(1);opacity:1}}
+.sl-reward{margin:22px 40px 0;align-self:flex-start;background:var(--sl-gold);color:var(--sl-medal-ink);border-radius:999px;padding:6px 30px;font-family:var(--display);font-size:52px}
+.sl-reveal.multi .sl-reward{font-size:38px}
+.sl-pstep small{display:block;font-family:var(--body);font-size:36px;font-weight:800;color:var(--sl-muted);text-align:center}
+.sl-ctrl .team-mini.on{outline:3px solid var(--ink);outline-offset:1px}
+.sl-wrw{flex:none;margin:18px 32px 0;align-self:flex-start;background:var(--sl-gold);color:var(--sl-medal-ink);border-radius:999px;padding:4px 24px;font-family:var(--display);font-size:40px;white-space:nowrap;max-width:calc(100% - 64px);overflow:hidden;text-overflow:ellipsis}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -519,12 +620,16 @@ html.deck-on,html.deck-on body{overflow:hidden}
 const TEAMS = [1, 2, 3, 4, 5, 6];
 const TEAM_COUNT = 6;
 const COLOR_NAMES = {1: '빨강', 2: '주황', 3: '노랑', 4: '초록', 5: '파랑', 6: '보라'};
-const CATS = {base: '베이스', topping: '토핑', seasoning: '시즈닝'};
-const CAT_KEYS = ['base', 'topping', 'seasoning'];
-const DRAFT_MODES = {
-  '121': ['base', 'topping', 'topping', 'seasoning'],
-  '132': ['base', 'topping', 'topping', 'topping', 'seasoning', 'seasoning']
-};
+// Ingredient kinds, bottom layer first. Each kind is off, shared by every team, or drafted 1–3 times.
+const KINDS = ['base', 'spread', 'topping', 'sauce', 'seasoning'];
+const CATS = {base: '베이스', spread: '스프레드', topping: '토핑', sauce: '소스', seasoning: '시즈닝'};
+const KIND_MODES = ['off', 'common', '1', '2', '3'];
+// Chapel: pulpit at the top, pews in the middle, three tables by the left windows, three behind the pews.
+const SPOTS = [
+  {id: 'w1', name: '창가 앞'}, {id: 'w2', name: '창가 가운데'}, {id: 'w3', name: '창가 뒤'},
+  {id: 'b1', name: '뒤쪽 왼쪽'}, {id: 'b2', name: '뒤쪽 가운데'}, {id: 'b3', name: '뒤쪽 오른쪽'}
+];
+const DEFAULT_SEATS = {1: 'w1', 2: 'w2', 3: 'w3', 4: 'b1', 5: 'b2', 6: 'b3'};
 const POINTS = [5, 3, 1];
 const CODE_PREFIX = 'KC1-';
 
@@ -573,25 +678,29 @@ function smallestTeam(sizes, rng) {
   const c = TEAMS.filter(t => (sizes[t] || 0) === min);
   return c[Math.floor(r() * c.length)];
 }
+const kindMode = (menu, k) => String((menu && menu[k] && menu[k].mode) || 'off');
+function draftKinds(menu) { return KINDS.filter(k => /^[123]$/.test(kindMode(menu, k))); }
+function commonKinds(menu) { return KINDS.filter(k => kindMode(menu, k) === 'common'); }
+function activeKinds(menu) { return KINDS.filter(k => kindMode(menu, k) !== 'off'); }
+function kindItems(menu, k) { return (menu && menu[k] && Array.isArray(menu[k].items)) ? menu[k].items : []; }
+// One entry per draft round, in layer order: spread, spread, topping, ...
+function roundCats(menu) {
+  const out = [];
+  draftKinds(menu).forEach(k => { for (let i = 0; i < Number(kindMode(menu, k)); i++) out.push(k); });
+  return out;
+}
 // Snake order: round 1 goes ①→⑥, round 2 goes ⑥→①, and so on.
-function draftSequence(rps, mode) {
-  const cats = DRAFT_MODES[mode] || DRAFT_MODES['121'];
+function draftSequence(rps, cats) {
   if (!Array.isArray(rps) || rps.length !== TEAM_COUNT) return [];
   const seq = [];
-  cats.forEach((cat, ri) => {
+  (cats || []).forEach((cat, ri) => {
     const order = ri % 2 === 0 ? rps : rps.slice().reverse();
     order.forEach(team => { seq.push({round: ri + 1, cat: cat, team: Number(team), slot: rps.indexOf(team) + 1}); });
   });
   return seq;
 }
-function pickCounts(mode) {
-  const c = {base: 0, topping: 0, seasoning: 0};
-  (DRAFT_MODES[mode] || DRAFT_MODES['121']).forEach(k => { c[k] += 1; });
-  return c;
-}
-function catOrdinal(mode, round) {
-  const cats = DRAFT_MODES[mode] || DRAFT_MODES['121'];
-  const cat = cats[round - 1];
+function catOrdinal(cats, round) {
+  const cat = (cats || [])[round - 1];
   if (!cat) return '';
   if (cats.filter(c => c === cat).length < 2) return '';
   let n = 0;
@@ -599,12 +708,12 @@ function catOrdinal(mode, round) {
   return n + '번째';
 }
 function ingKey(cat, name) { return cat + '|' + name; }
-function remainingSets(ingredients, picks) {
+function remainingSets(menu, picks) {
   const used = {};
   (picks || []).forEach(p => { if (p && p.name) { const k = ingKey(p.cat, p.name); used[k] = (used[k] || 0) + 1; } });
   const out = {};
-  CAT_KEYS.forEach(cat => {
-    ((ingredients && ingredients[cat]) || []).forEach(it => {
+  draftKinds(menu).forEach(cat => {
+    kindItems(menu, cat).forEach(it => {
       const k = ingKey(cat, it.name);
       out[k] = Math.max(0, (Number(it.sets) || 0) - (used[k] || 0));
     });
@@ -612,6 +721,54 @@ function remainingSets(ingredients, picks) {
   return out;
 }
 function teamPicks(picks, team) { return (picks || []).filter(p => p && Number(p.team) === Number(team) && p.name); }
+// Everything a team cooks with: what every team shares, then what it picked.
+function teamItems(menu, picks, team) {
+  const out = [];
+  commonKinds(menu).forEach(k => kindItems(menu, k).forEach(it => out.push({cat: k, name: it.name, common: true})));
+  teamPicks(picks, team).forEach(p => out.push({cat: p.cat, name: p.name, common: false}));
+  return out;
+}
+function findItem(menu, cat, name) { return kindItems(menu, cat).find(it => it.name === name) || null; }
+// Drafted kinds whose sets cannot cover every team's picks.
+function menuShortages(menu) {
+  return draftKinds(menu).map(k => ({cat: k, need: TEAM_COUNT * Number(kindMode(menu, k)),
+    have: kindItems(menu, k).reduce((s, it) => s + (Number(it.sets) || 0), 0)})).filter(x => x.have < x.need);
+}
+// True when the saved picks no longer line up with the current round plan (the menu changed mid-draft).
+function draftMismatch(seq, picks) {
+  return (picks || []).some((p, i) => !seq[i] || seq[i].cat !== p.cat || seq[i].team !== Number(p.team));
+}
+// Allergy matching: a kid's free-text note against an ingredient's name and #tags. Over-warning is fine.
+const ALLERGY_GROUPS = [
+  ['달걀', '계란', '알류', '난류'], ['우유', '유제품', '치즈', '버터', '크림', '요거트', '유당'], ['땅콩', '피넛'],
+  ['견과', '견과류', '호두', '아몬드', '헤이즐넛', '잣', '캐슈넛', '피스타치오', '마카다미아', '피칸', '누텔라'],
+  ['대두', '콩', '두유', '콩고물'], ['밀', '밀가루', '글루텐'], ['게', '갑각류', '게맛살', '크래미'], ['새우', '갑각류'],
+  ['생선', '어류', '참치', '고등어', '연어'], ['돼지고기', '돼지', '햄', '베이컨'], ['닭고기', '닭'], ['쇠고기', '소고기'],
+  ['조개', '조개류', '홍합'], ['오징어'], ['토마토'], ['복숭아'], ['메밀'], ['키위'], ['바나나'], ['딸기'], ['포도'], ['블루베리'], ['아황산']
+];
+function allergyWords(text) {
+  return String(text || '').split(/[,，、/·\s]+/).map(w => w.replace(/(알레르기|알러지|있음|주의|조심)$/, '').trim())
+    .filter(w => w && !/^(없음|없어요|무|x|-|아니요|해당없음)$/i.test(w));
+}
+function allergyHit(item, text) {
+  const name = String((item && item.name) || ''), tags = ((item && item.tags) || []).map(String);
+  for (const w of allergyWords(text)) {
+    const words = [w];
+    ALLERGY_GROUPS.forEach(g => {
+      if (g.indexOf(w) >= 0 || g.some(x => x.length >= 2 && w.indexOf(x) >= 0)) g.forEach(x => { if (words.indexOf(x) < 0) words.push(x); });
+    });
+    if (words.some(x => name.indexOf(x) >= 0 || tags.some(t => t === x || (x.length >= 2 && t.indexOf(x) >= 0) || (t.length >= 2 && x.indexOf(t) >= 0)))) return w;
+  }
+  return '';
+}
+// Each team gets a distinct spot; anything missing or repeated falls back to the next free spot.
+function normSeats(raw) {
+  const out = {}, used = {};
+  TEAMS.forEach(t => { const s = raw && raw[t]; if (SPOTS.some(x => x.id === s) && !used[s]) { out[t] = s; used[s] = true; } });
+  TEAMS.forEach(t => { if (!out[t]) { const free = SPOTS.find(x => !used[x.id]); out[t] = free.id; used[free.id] = true; } });
+  return out;
+}
+function spotName(id) { const s = SPOTS.find(x => x.id === id); return s ? s.name : ''; }
 function computeTargets(sizes) {
   const total = TEAMS.reduce((s, t) => s + (sizes[t] || 0), 0);
   return TEAMS.map(t => ({
@@ -696,13 +853,21 @@ function decodeBallot(code) {
     return {voter: voter, ballot: ballot, canape: o.n ? String(o.n).slice(0, 24) : ''};
   } catch (e) { return null; }
 }
+// One item per line: '이름 세트수 #알레르기 #알레르기'. '(2팀)' as in last year's sheet also works.
 function parseIngredients(text) {
   const seen = {};
   return String(text || '').split(/\n+/).map(l => l.trim()).filter(Boolean).map(l => {
-    const m = l.match(/^(.*?)[\s,×*]*(\d+)\s*(세트)?$/);
-    if (m && m[1].trim()) return {name: m[1].trim().slice(0, 30), sets: Math.max(0, Math.min(20, parseInt(m[2], 10)))};
-    return {name: l.slice(0, 30), sets: 1};
-  }).filter(it => { if (seen[it.name]) return false; seen[it.name] = true; return true; }).slice(0, 30);
+    const tags = [];
+    let rest = l.replace(/#\s*([^\s#,]+)/g, (m, t) => { if (tags.indexOf(t) < 0 && tags.length < 8) tags.push(t.slice(0, 12)); return ' '; });
+    rest = rest.replace(/[(（]\s*(\d+)\s*(세트|팀|개)?\s*[)）]/, ' $1').replace(/\s+/g, ' ').replace(/[,\s]+$/, '').trim();
+    const m = rest.match(/^(.*?)[\s,×*xX]*(\d+)\s*(세트|팀|개)?$/);
+    let name = rest, sets = 1;
+    if (m && m[1].trim()) { name = m[1].trim(); sets = Math.max(0, Math.min(20, parseInt(m[2], 10))); }
+    return {name: name.replace(/[,\s]+$/, '').slice(0, 30), sets: sets, tags: tags};
+  }).filter(it => { if (!it.name || seen[it.name]) return false; seen[it.name] = true; return true; }).slice(0, 30);
+}
+function itemsToText(items, common) {
+  return (items || []).map(it => it.name + (common ? '' : ' ' + it.sets) + (it.tags || []).map(t => ' #' + t).join('')).join('\n');
 }
 function fmtClock(ms) {
   const s = Math.max(0, Math.ceil(ms / 1000));
@@ -723,19 +888,42 @@ const STEPS = [
   {key: 'vote', label: '투표', timer: 'vote'}, {key: 'reveal', label: '발표'}, {key: 'winners', label: 'Top3 명단'}
 ];
 const CIRC = ['①', '②', '③', '④', '⑤', '⑥'];
+// Last year's sheet: one shared base, then spread, topping, sauce and seasoning picked in rounds.
+// Peanut butter and Nutella are left out (no nuts); sets are sized so all six teams get one of each.
+// Allergy tags are typical contents; check the labels of what you buy.
+const DEFAULT_MENU = {
+  base: {mode: 'common', items: [{name: '아이비 크래커', sets: 1, tags: ['밀', '우유', '대두']}]},
+  spread: {mode: '1', items: [
+    {name: '에그 샐러드', sets: 1, tags: ['달걀', '대두']}, {name: '크림치즈', sets: 1, tags: ['우유']},
+    {name: '휘핑 크림', sets: 1, tags: ['우유']}, {name: '감자 샐러드', sets: 1, tags: ['달걀', '대두']},
+    {name: '참치마요', sets: 1, tags: ['생선', '달걀', '대두']}, {name: '햄 마카로니 샐러드', sets: 1, tags: ['밀', '돼지고기', '달걀', '대두']}]},
+  topping: {mode: '1', items: [
+    {name: '샌드위치 햄', sets: 2, tags: ['돼지고기', '대두', '밀']}, {name: '슬라이스 치즈', sets: 3, tags: ['우유']},
+    {name: '씨없는 포도', sets: 1, tags: []}, {name: '크래미', sets: 1, tags: ['게', '달걀', '밀', '대두']},
+    {name: '바나나', sets: 1, tags: []}, {name: '블루베리', sets: 1, tags: []}]},
+  sauce: {mode: '1', items: [
+    {name: '딸기잼', sets: 2, tags: []}, {name: '초코시럽', sets: 2, tags: ['우유']},
+    {name: '버터', sets: 1, tags: ['우유']}, {name: '청양마요', sets: 1, tags: ['달걀', '대두']}]},
+  seasoning: {mode: '1', items: [
+    {name: '콩고물 가루', sets: 2, tags: ['대두']}, {name: '허니버터 시즈닝', sets: 2, tags: ['우유']},
+    {name: '뿌링클 시즈닝', sets: 2, tags: ['우유', '대두', '밀']}]}
+};
 const DEFAULT_CONFIG = {
   eventName: '소년부 까나페 챌린지',
   voteUrl: '',
-  draftMode: '121',
-  ingredients: {
+  menu: DEFAULT_MENU,
+  rewards: ['5달란트', '3달란트', '1달란트'],
+  seats: DEFAULT_SEATS
+};
+// The first version's built-in list; a saved list that differs from it was edited by hand and is kept.
+const LEGACY_ING = {
     base: [{name: '크래커 (리츠류)', sets: 3}, {name: '바게트 슬라이스', sets: 2}, {name: '식빵 모양컷', sets: 2}, {name: '오이 슬라이스', sets: 1}],
     topping: [{name: '크림치즈', sets: 2}, {name: '참치마요', sets: 2}, {name: '슬라이스 햄', sets: 2}, {name: '큐브 치즈', sets: 2},
       {name: '방울토마토', sets: 2}, {name: '딸기잼', sets: 1}, {name: '게맛살', sets: 1}, {name: '샤인머스캣', sets: 1},
       {name: '귤', sets: 1}, {name: '블루베리', sets: 1}, {name: '미니 마시멜로', sets: 1}],
     seasoning: [{name: '꿀', sets: 1}, {name: '초코시럽', sets: 1}, {name: '연유', sets: 1}, {name: '마요네즈', sets: 1},
       {name: '케첩', sets: 1}, {name: '파슬리 가루', sets: 1}, {name: '슈가파우더', sets: 1}, {name: '컬러 스프링클', sets: 1}]
-  }
-};
+  };
 
 /* ---------- small utils ---------- */
 const $ = (s, el) => (el || document).querySelector(s);
@@ -810,7 +998,7 @@ function makeMemDB(persistKey) {
 const S = {
   loaded: false, raw: {}, serverExists: {},
   config: clone(DEFAULT_CONFIG),
-  state: {rps: [], picks: [], timer: {}, voting: {}, reveal: {}, hidden: {}},
+  state: {rps: [], picks: [], timer: {}, voting: {}, reveal: {}, hidden: {}, stage: {}, done: {}},
   roster: {kids: {}, teachers: {}},
   teams: {assign: {}, teacherAssign: {}, formedAt: null, rolls: 0},
   votes: {}, canape: {}
@@ -826,28 +1014,47 @@ const ui = {
 };
 if (!STEPS.some(s => s.key === ui.step)) ui.step = 'register';
 
-function normIngredients(raw) {
-  const out = {};
-  CAT_KEYS.forEach(cat => {
-    const list = arr(raw && raw[cat]).filter(it => it && typeof it.name === 'string' && it.name.trim())
-      .map(it => ({name: it.name.trim().slice(0, 30), sets: Math.max(0, Math.min(20, Number(it.sets) || 0))}));
-    out[cat] = raw && Array.isArray(raw[cat]) ? list : clone(DEFAULT_CONFIG.ingredients[cat]);
-  });
-  return out;
+function sanitizeItems(list) {
+  const seen = {};
+  return arr(list).filter(it => it && typeof it.name === 'string' && it.name.trim()).map(it => ({
+    name: it.name.trim().slice(0, 30), sets: Math.max(0, Math.min(20, Number(it.sets) || 0)),
+    tags: arr(it.tags).map(t => String(t).trim().slice(0, 12)).filter(Boolean).slice(0, 8)
+  })).filter(it => { if (seen[it.name]) return false; seen[it.name] = true; return true; }).slice(0, 30);
+}
+function normMenu(c) {
+  if (c.menu && typeof c.menu === 'object') {
+    const out = {};
+    KINDS.forEach(k => { const m = obj(c.menu[k]); out[k] = {mode: KIND_MODES.indexOf(String(m.mode)) >= 0 ? String(m.mode) : 'off', items: sanitizeItems(m.items)}; });
+    return out;
+  }
+  const ing = obj(c.ingredients), old = ['base', 'topping', 'seasoning'];
+  const sig = src => JSON.stringify(old.map(k => arr(src[k]).map(it => [it && it.name, Number(it && it.sets)])));
+  if (Object.keys(ing).length && sig(ing) !== sig(LEGACY_ING)) {
+    const plan = c.draftMode === '132' ? {base: '1', topping: '3', seasoning: '2'} : {base: '1', topping: '2', seasoning: '1'};
+    const out = {};
+    KINDS.forEach(k => { out[k] = plan[k] ? {mode: plan[k], items: sanitizeItems(ing[k])} : {mode: 'off', items: []}; });
+    return out;
+  }
+  return clone(DEFAULT_MENU);
+}
+function normRewards(r) {
+  const a = arr(r);
+  return [0, 1, 2].map(i => typeof a[i] === 'string' ? a[i].trim().slice(0, 20) : DEFAULT_CONFIG.rewards[i]);
 }
 function applyEvent(d) {
   const c = obj(d.config);
   S.config = {
     eventName: typeof c.eventName === 'string' && c.eventName.trim() ? c.eventName.slice(0, 30) : DEFAULT_CONFIG.eventName,
     voteUrl: typeof c.voteUrl === 'string' ? c.voteUrl.slice(0, 300) : '',
-    draftMode: DRAFT_MODES[c.draftMode] ? c.draftMode : '121',
-    ingredients: normIngredients(c.ingredients)
+    menu: normMenu(c),
+    rewards: normRewards(c.rewards),
+    seats: normSeats(c.seats)
   };
   const st = obj(d.state);
   S.state = {
     rps: arr(st.rps).map(Number).filter((t, i, a) => TEAMS.indexOf(t) >= 0 && a.indexOf(t) === i).slice(0, 6),
     picks: arr(st.picks).filter(p => p && typeof p === 'object').map(p => ({team: Number(p.team), cat: String(p.cat), name: p.name ? String(p.name) : null, round: Number(p.round) || 0})),
-    timer: obj(st.timer), voting: obj(st.voting), reveal: obj(st.reveal), hidden: obj(st.hidden), stage: obj(st.stage),
+    timer: obj(st.timer), voting: obj(st.voting), reveal: obj(st.reveal), hidden: obj(st.hidden), stage: obj(st.stage), done: obj(st.done),
     voteResetAt: Number(st.voteResetAt) || 0
   };
   const ro = obj(d.roster);
@@ -878,6 +1085,34 @@ const sizes = () => countBy(S.teams.assign, kids().map(k => k.id));
 const canapeName = t => String(S.canape[t] || '').trim();
 const resultsNow = () => computeResults(S.votes);
 const votedCount = () => TEAMS.filter(t => validBallot(S.votes[t], t)).length;
+const seatName = t => spotName(S.config.seats[t]);
+const rewardFor = rank => (rank >= 1 && rank <= 3) ? (S.config.rewards[rank - 1] || '') : '';
+// Teams in the order they finished making (the bell), first to last.
+const doneOrder = () => TEAMS.filter(t => S.state.done[t] && S.state.done[t].at).sort((a, b) => S.state.done[a].at - S.state.done[b].at);
+function itemAllergyKids(item) {
+  return kids().filter(k => k.allergy).map(k => ({kid: k, word: allergyHit(item, k.allergy)})).filter(x => x.word);
+}
+// For one kid: every canapé (by maker team, 0 = all of them through a shared item) holding something they react to.
+function kidHits(k) {
+  const menu = S.config.menu, out = [];
+  commonKinds(menu).forEach(cat => kindItems(menu, cat).forEach(it => { const w = allergyHit(it, k.allergy); if (w) out.push({team: 0, name: it.name, word: w}); }));
+  TEAMS.forEach(t => teamPicks(S.state.picks, t).forEach(p => {
+    const w = allergyHit(findItem(menu, p.cat, p.name) || {name: p.name}, k.allergy);
+    if (w) out.push({team: t, name: p.name, word: w});
+  }));
+  return out;
+}
+function allergyAlerts() {
+  return kids().filter(k => k.allergy).map(k => ({kid: k, team: teamOfReal(k.id), hits: kidHits(k)})).filter(a => a.hits.length);
+}
+// "1조(크림치즈) · 3조(버터) 먹지 않기" from one kid's hits.
+function skipText(a, ownWord) {
+  const shared = a.hits.filter(h => !h.team);
+  if (shared.length) return '모든 까나페 주의 (공통 재료 ' + shared.map(h => h.name).join(', ') + ')';
+  const by = {};
+  a.hits.forEach(h => { (by[h.team] = by[h.team] || []).push(h.name); });
+  return Object.keys(by).map(t => (Number(t) === a.team ? (ownWord || '자기 조') : t + '조') + '(' + by[t].join(', ') + ')').join(' · ') + ' 먹지 않기';
+}
 function voteLink() {
   if (!IN_CLAUDE) { const id = hostIdentity(); return location.href.split('#')[0] + '#vote/' + id.e + '/' + id.k; }
   const u = String(S.config.voteUrl || '').trim(); return u ? u.split('#')[0] + '#vote' : '';
@@ -1060,6 +1295,22 @@ function chime(freqs, dur) {
     o.connect(g); g.connect(ctx.destination);
     o.start(t0); o.stop(t0 + dur + 0.03);
     t0 += dur + 0.08;
+  });
+}
+// A struck bell for the "we're done" moment.
+function bell() {
+  if (!ui.sound) return;
+  const ctx = audio();
+  if (!ctx) return;
+  const t0 = ctx.currentTime + 0.02;
+  [[1, 0.42], [2.76, 0.2], [5.4, 0.1], [8.93, 0.05]].forEach(pt => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = 830 * pt[0];
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(pt[1], t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.8 / Math.sqrt(pt[0]));
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t0); o.stop(t0 + 2);
   });
 }
 let lastSec = null, lastKey = null;
@@ -1285,7 +1536,8 @@ function hostBody() {
   return {
     v: 1, eventName: S.config.eventName, voting: {open: !!S.state.voting.open}, timer: S.state.timer || {},
     roster: {kids: kidsOut, teachers: tOut}, teams: {assign: S.teams.assign, teacherAssign: S.teams.teacherAssign, formedAt: S.teams.formedAt},
-    canape: S.canape, voted: TEAMS.filter(t => validBallot(S.votes[t], t)), resetAt: Number(S.state.voteResetAt) || 0
+    canape: S.canape, voted: TEAMS.filter(t => validBallot(S.votes[t], t)), resetAt: Number(S.state.voteResetAt) || 0,
+    menu: S.config.menu, picks: S.state.picks, seats: S.config.seats
   };
 }
 async function hostPublish(force) {
@@ -1352,7 +1604,10 @@ function phoneApply(msg, fresh) {
   if (typeof msg.eventName === 'string' && msg.eventName.trim()) S.config.eventName = msg.eventName.slice(0, 30);
   const tm = Object.assign({}, obj(msg.timer));
   if (tm.running && tm.endsAt) tm.endsAt = Number(tm.endsAt) - PH.offset;
-  S.state = Object.assign({}, S.state, {voting: obj(msg.voting), timer: tm});
+  const picks = arr(msg.picks).filter(p => p && typeof p === 'object').map(p => ({team: Number(p.team), cat: String(p.cat), name: p.name ? String(p.name).slice(0, 30) : null, round: Number(p.round) || 0}));
+  S.state = Object.assign({}, S.state, {voting: obj(msg.voting), timer: tm, picks: picks});
+  if (msg.menu) S.config.menu = normMenu({menu: msg.menu});
+  S.config.seats = normSeats(msg.seats);
   const ro = obj(msg.roster);
   S.roster = {kids: obj(ro.kids), teachers: obj(ro.teachers)};
   const tms = obj(msg.teams);
@@ -1485,10 +1740,32 @@ function panelRegister() {
     '<div class="row"><button type="button" class="btn ghost" data-act="sample-fill">연습용 넣기</button><button type="button" class="btn ghost" data-act="sample-clear">연습용 지우기</button></div></div></div>';
 }
 
+// The chapel, drawn from the user's description: pulpit at the top, pews in the middle,
+// three tables along the left windows and three behind the pews. Units are a 1600×820 floor.
+const SPOT_BOX = {w1: [90, 140, 300, 120], w2: [90, 300, 300, 120], w3: [90, 460, 300, 120], b1: [365, 640, 290, 130], b2: [695, 640, 290, 130], b3: [1025, 640, 290, 130]};
+function roomSvg(o) {
+  const opt = o || {}, sz = formed() ? sizes() : null;
+  let pews = '';
+  for (let i = 0; i < 7; i++) pews += '<rect class="room-pew" x="560" y="' + (180 + i * 50) + '" width="250" height="28" rx="8"/><rect class="room-pew" x="870" y="' + (180 + i * 50) + '" width="250" height="28" rx="8"/>';
+  const tables = TEAMS.map(t => {
+    const b = SPOT_BOX[S.config.seats[t]] || SPOT_BOX.w1, cx = b[0] + b[2] / 2;
+    const sub = opt.detail ? [sz ? sz[t] + '명' : '', teamTeachers(t).map(x => x.name).join(', ')].filter(Boolean).join(' · ') : '';
+    return '<g class="room-table t' + t + (opt.highlight && opt.highlight !== t ? ' dim' : '') + (opt.highlight === t ? ' me' : '') + '">' +
+      '<rect x="' + b[0] + '" y="' + b[1] + '" width="' + b[2] + '" height="' + b[3] + '" rx="18"/>' +
+      '<text class="tno" x="' + cx + '" y="' + (b[1] + (sub ? 62 : b[3] / 2 + 22)) + '" text-anchor="middle">' + t + '조</text>' +
+      (sub ? '<text class="tsub" x="' + cx + '" y="' + (b[1] + 102) + '" text-anchor="middle">' + esc(sub.length > 16 ? sub.slice(0, 15) + '…' : sub) + '</text>' : '') + '</g>';
+  }).join('');
+  return '<svg class="room' + (opt.cls ? ' ' + opt.cls : '') + '" viewBox="0 0 1600 820" role="img" aria-label="자리 배치: 위쪽 강대상, 가운데 회중석, 왼쪽 창가에 테이블 3개, 회중석 뒤에 테이블 3개">' +
+    '<rect class="room-floor" x="4" y="4" width="1592" height="812" rx="28"/>' +
+    '<rect class="room-stage" x="560" y="4" width="560" height="114" rx="18"/><text class="room-label" x="840" y="76" text-anchor="middle">강대상</text>' +
+    pews + '<rect class="room-pill" x="740" y="312" width="200" height="60" rx="30"/><text class="room-label" x="840" y="356" text-anchor="middle">회중석</text>' +
+    [130, 290, 450].map(y => '<rect class="room-window" x="4" y="' + y + '" width="16" height="140" rx="4"/>').join('') +
+    '<text class="room-label sm" x="52" y="360" text-anchor="middle" transform="rotate(-90 52 360)">창가</text>' + tables + '</svg>';
+}
 function ticket(t, size) {
   const mem = members(t), tch = ui.animating ? [] : teamTeachers(t);
   const who = tch.length ? tch.map(x => esc(x.name)).join(', ') + ' 선생님' : (formed() && !ui.animating ? '담당 선생님 미정' : '');
-  return '<article class="ticket t' + t + '"><header><span class="tno">' + t + '조</span><span class="tmeta"><span>' + COLOR_NAMES[t] + '</span><span>' + who + '</span></span><span class="tcount num">' + size + '명</span></header>' +
+  return '<article class="ticket t' + t + '"><header><span class="tno">' + t + '조</span><span class="tmeta"><span>' + COLOR_NAMES[t] + ' · ' + esc(seatName(t)) + '</span><span>' + who + '</span></span><span class="tcount num">' + size + '명</span></header>' +
     (canapeName(t) && !ui.animating ? '<div class="cname">“' + esc(canapeName(t)) + '”</div>' : '') +
     '<div class="perf" aria-hidden="true"></div><ul class="members">' + mem.map(k =>
       '<li><button type="button" class="mem' + (ui.moveKid === k.id ? ' sel' : '') + '" data-act="kid-pick" data-id="' + k.id + '">' + esc(k.name) + (k.grade ? '<small>' + esc(k.grade) + '</small>' : '') + '</button></li>').join('') + '</ul>' +
@@ -1499,14 +1776,16 @@ function stageTeams() {
   if (!formed() && !ui.animating) {
     return head('2단계 · 랜덤 조 편성', n + '명을 6개 조로 나눠요', (n ? sizeSummary(n) + ' · ' : '') + '선생님 ' + teachers().length + '명도 함께 섞어요') +
       '<div class="empty"><b>준비되면 조 편성을 시작하세요</b><span>' + (n < 6 ? '아이가 6명보다 적어요. 먼저 등록해 주세요.' : '학년이 고르게 섞이도록 나눠요.') + '</span>' +
-      '<div class="op" style="margin-top:.8rem"><button type="button" class="btn big" data-act="form-teams"' + (n ? '' : ' disabled') + '>조 편성 시작</button></div></div>';
+      '<div class="op" style="margin-top:.8rem"><button type="button" class="btn big" data-act="form-teams"' + (n ? '' : ' disabled') + '>조 편성 시작</button></div></div>' +
+      '<section class="room-card"><h2>자리 배치</h2>' + roomSvg({}) + '</section>';
   }
   const sz = countBy(ui.tempAssign || S.teams.assign, list.map(k => k.id));
   const rest = formed() && !ui.animating ? list.filter(k => !teamOfReal(k.id)) : [];
   return head('2단계 · 조 편성 결과', ui.animating ? '섞는 중…' : '우리 조를 찾아 모여요',
     ui.moveKid ? '옮길 조에서 \'여기로 옮기기\'를 누르세요. Esc를 누르면 취소돼요.' : '자기 이름을 찾으면 조 색 스티커를 받고 조 테이블로 가요') +
     '<div class="tickets">' + TEAMS.map(t => ticket(t, sz[t])).join('') + '</div>' +
-    (rest.length ? '<div class="banner op">조가 없는 친구 ' + rest.length + '명: ' + rest.map(k => esc(k.name)).join(', ') + ' <button type="button" class="btn sm" data-act="assign-rest">인원 적은 조에 넣기</button></div>' : '');
+    (rest.length ? '<div class="banner op">조가 없는 친구 ' + rest.length + '명: ' + rest.map(k => esc(k.name)).join(', ') + ' <button type="button" class="btn sm" data-act="assign-rest">인원 적은 조에 넣기</button></div>' : '') +
+    (ui.animating ? '' : '<section class="room-card"><h2>자리 배치</h2>' + roomSvg({detail: true}) + '</section>');
 }
 function panelTeams() {
   return '<span class="eyebrow">진행 도구</span><div class="cards">' +
@@ -1516,19 +1795,28 @@ function panelTeams() {
     '<div class="card"><h3>선생님 폰 연결</h3><div data-dyn="qr-mini"></div></div></div>';
 }
 
+function warnBadge(item) {
+  const n = itemAllergyKids(item).length;
+  return n ? '<i class="warn" title="알레르기 친구 ' + n + '명">⚠ ' + n + '</i>' : '';
+}
 function menuBoard(withRemaining) {
-  const counts = pickCounts(S.config.draftMode);
-  const rem = withRemaining ? remainingSets(S.config.ingredients, S.state.picks) : null;
-  return '<div class="menu">' + CAT_KEYS.map(cat => '<section><h3>' + CATS[cat] + '<small>조당 ' + counts[cat] + '개</small></h3><ul>' +
-    (S.config.ingredients[cat] || []).map(it => {
-      const left = rem ? rem[ingKey(cat, it.name)] : it.sets;
-      return '<li class="' + (it.sets === 1 ? 'limited' : '') + (rem && left === 0 ? ' out' : '') + '"><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><span class="sets">' + (rem ? left + '/' + it.sets : it.sets + '세트') + '</span></li>';
-    }).join('') + '</ul></section>').join('') + '</div>';
+  const menu = S.config.menu, drafted = draftKinds(menu), common = commonKinds(menu);
+  const rem = withRemaining ? remainingSets(menu, S.state.picks) : null;
+  const short = menuShortages(menu);
+  return (common.length ? '<div class="common-strip">' + common.map(k => '<span><b>' + CATS[k] + '</b> 모든 조 공통 · ' +
+      kindItems(menu, k).map(it => esc(it.name) + warnBadge(it)).join(', ') + '</span>').join('') + '</div>' : '') +
+    '<div class="menu" style="--cols:' + Math.max(1, Math.min(4, drafted.length)) + '">' + drafted.map(cat => '<section><h3>' + CATS[cat] + '<small>조마다 ' + kindMode(menu, cat) + '개</small></h3><ul>' +
+      kindItems(menu, cat).map(it => {
+        const left = rem ? rem[ingKey(cat, it.name)] : it.sets;
+        return '<li class="' + (it.sets === 1 ? 'limited' : '') + (rem && left === 0 ? ' out' : '') + '"><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + warnBadge(it) +
+          (it.tags.length ? '<small class="tags op">' + esc(it.tags.join('·')) + '</small>' : '') + '</span><span class="sets">' + (rem ? left + '/' + it.sets : it.sets + '세트') + '</span></li>';
+      }).join('') + '</ul></section>').join('') + '</div>' +
+    (short.length ? '<p class="banner op">' + short.map(x => CATS[x.cat] + ' ' + x.have + '세트로는 ' + x.need + '번 고르기에 모자라요').join(' · ') + '. 설정에서 세트를 늘리거나 고르는 개수를 줄여 주세요.</p>' : '');
 }
 function stagePlan() {
   return head('3단계 · 재료 구경과 기획 회의', '우리 조 까나페를 정해요', '처음 1분은 재료 테이블 구경, 남은 시간은 조 테이블에서 기획서 쓰기') +
-    '<div class="split">' + timerCard('plan') + '<div class="stack"><ul class="todo"><li>까나페 이름 짓기</li><li>베이스·토핑·시즈닝 1지망과 2지망</li><li>역할 나누기: 깔기 · 바르기 · 올리기 · 뿌리기 · 담기</li><li>조 대표 1명 정하기</li></ul>' +
-    '<p class="hint">★ 표시는 1세트뿐이라 먼저 고른 조만 가져가요. 토핑 하나를 크림치즈·참치마요·잼처럼 바르는 재료로 고르면 다른 재료가 잘 붙어요.</p></div></div>' + menuBoard(false);
+    '<div class="split">' + timerCard('plan') + '<div class="stack"><ul class="todo"><li>까나페 이름 짓기</li><li>' + (draftKinds(S.config.menu).map(k => CATS[k]).join('·') || '재료') + ' 1지망과 2지망</li><li>역할 나누기: 깔기 · 바르기 · 올리기 · 뿌리기 · 담기</li><li>조 대표 1명 정하기</li></ul>' +
+    '<p class="hint">★ 표시는 1세트뿐이라 먼저 고른 조만 가져가요.' + (kindMode(S.config.menu, 'spread') !== 'off' ? ' 스프레드를 먼저 바르면 토핑이 잘 붙어요.' : '') + '</p></div></div>' + menuBoard(false);
 }
 
 function draftRows(seq, picks, idx) {
@@ -1550,26 +1838,37 @@ function stageDraft() {
       '<div class="rps-teams">' + TEAMS.map(t => '<button type="button" class="team-btn t' + t + '" data-act="rps-add" data-team="' + t + '"' + (rps.indexOf(t) >= 0 ? ' disabled' : '') + '>' + t + '조</button>').join('') + '</div>' +
       (rps.length ? '<ol class="rps-order">' + rps.map((t, i) => '<li class="t' + t + '">' + CIRC[i] + ' ' + t + '조</li>').join('') + '</ol><div class="row op"><button type="button" class="btn ghost" data-act="rps-undo">하나 되돌리기</button></div>' : '');
   }
-  const seq = draftSequence(rps, S.config.draftMode), picks = S.state.picks, idx = picks.length, done = idx >= seq.length;
-  const rem = remainingSets(S.config.ingredients, picks);
+  const menu = S.config.menu, cats = roundCats(menu);
+  const seq = draftSequence(rps, cats), picks = S.state.picks, idx = picks.length, done = idx >= seq.length;
+  const rem = remainingSets(menu, picks);
+  const mismatch = draftMismatch(seq, picks);
   let now;
   if (!done) {
     const cur = seq[idx];
     const have = teamPicks(picks, cur.team).filter(p => p.cat === cur.cat).map(p => p.name);
-    const items = S.config.ingredients[cur.cat] || [];
+    const items = kindItems(menu, cur.cat);
     const usable = items.filter(it => rem[ingKey(cur.cat, it.name)] > 0 && have.indexOf(it.name) < 0);
-    now = '<div class="now t' + cur.team + '"><div><span class="eyebrow">지금 고를 차례 · ' + (idx + 1) + '/' + seq.length + '</span><div class="who">' + CIRC[cur.slot - 1] + ' ' + cur.team + '조</div></div><div class="what">' + CATS[cur.cat] + ' ' + catOrdinal(S.config.draftMode, cur.round) + '</div></div>' +
+    now = '<div class="now t' + cur.team + '"><div><span class="eyebrow">지금 고를 차례 · ' + (idx + 1) + '/' + seq.length + '</span><div class="who">' + CIRC[cur.slot - 1] + ' ' + cur.team + '조</div></div><div class="what">' + CATS[cur.cat] + ' ' + catOrdinal(cats, cur.round) + '</div></div>' +
       '<div class="ings">' + items.map(it => {
         const left = rem[ingKey(cur.cat, it.name)];
         const dis = left <= 0 || have.indexOf(it.name) >= 0;
-        return '<button type="button" class="ing" data-act="pick" data-name="' + esc(it.name) + '"' + (dis ? ' disabled' : '') + '><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><span class="left">' + left + '/' + it.sets + '</span></button>';
-      }).join('') + '</div>' +
+        return '<button type="button" class="ing" data-act="pick" data-name="' + esc(it.name) + '"' + (dis ? ' disabled' : '') + '><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><span class="left">' + warnBadge(it) + left + '/' + it.sets + '</span></button>';
+      }).join('') + '</div>' + itemWarnList(items) +
       (usable.length ? '' : '<div class="banner">' + cur.team + '조가 고를 수 있는 ' + CATS[cur.cat] + '가 남지 않았어요. 진행 도구의 \'이번 차례 건너뛰기\'를 눌러 주세요.</div>');
   } else {
     now = '<div class="now"><div><span class="eyebrow">재료 수령 끝</span><div class="who">이제 만들 시간!</div></div></div>';
   }
-  return head('4단계 · 재료 수령 (지그재그)', done ? '모든 조가 재료를 받았어요' : '대표가 차례대로 재료를 골라요', '라운드마다 순서가 뒤집혀요. 같은 재료는 두 번 고를 수 없어요.') +
+  return head('4단계 · 재료 수령 (지그재그)', done ? '모든 조가 재료를 받았어요' : '대표가 차례대로 재료를 골라요', '라운드마다 순서가 뒤집혀요. 같은 재료는 두 번 고를 수 없어요.' +
+      (commonKinds(menu).length ? ' ' + commonKinds(menu).map(k => CATS[k]).join('·') + '는 모든 조가 똑같이 받아요.' : '')) +
+    (mismatch ? '<div class="banner bad op">재료 칸 구성이 바뀌어서 지금까지의 수령 기록과 맞지 않아요. 진행 도구의 \'순서 다시 정하기\'로 처음부터 다시 해 주세요.</div>' : '') +
     now + '<div class="scroll-x"><table class="dtable"><thead><tr><th></th>' + [1, 2, 3, 4, 5, 6].map(i => '<th>' + i + '번째</th>').join('') + '</tr></thead><tbody>' + draftRows(seq, picks, idx) + '</tbody></table></div>';
+}
+// Under the pick buttons: who would react to each ingredient on offer (operator only).
+function itemWarnList(items) {
+  const rows = items.map(it => ({it: it, kids: itemAllergyKids(it)})).filter(x => x.kids.length);
+  if (!rows.length) return '';
+  return '<ul class="warn-list op">' + rows.map(x => '<li><b>⚠ ' + esc(x.it.name) + '</b> ' + x.kids.map(k => esc(k.kid.name) + ' (' + (teamOfReal(k.kid.id) ? teamOfReal(k.kid.id) + '조 · ' : '') + esc(k.word) + ')').join(', ') + '</li>').join('') +
+    '</ul><p class="hint op">우리 조 까나페는 다른 조 친구들이 먹어요. 골라도 되지만, 그 친구는 이 조 접시를 건너뛰게 해 주세요.</p>';
 }
 function panelDraft() {
   return '<span class="eyebrow">진행 도구</span><div class="row"><button type="button" class="btn ghost" data-act="pick-undo">하나 되돌리기</button>' +
@@ -1580,14 +1879,17 @@ function panelDraft() {
 function stageMake() {
   const sz = sizes();
   const orders = formed() ? computeTargets(sz) : [];
-  return head('5단계 · 까나페 제작', '다른 조 친구들 몫을 만들어요', '조마다 시그니처 까나페 1종 · 받는 조 접시마다 그 조 인원수만큼') + timerCard('make') +
+  const order = doneOrder();
+  return head('5단계 · 까나페 제작', '다른 조 친구들 몫을 만들어요', '조마다 시그니처 까나페 1종 · 받는 조 접시마다 그 조 인원수만큼 · 다 만들면 종을 울려요' + (order.length ? ' · 완성 ' + order.length + '/6' : '')) + timerCard('make') +
     (orders.length ? '<div class="orders">' + orders.map(o => {
       const per = o.size ? Math.round(o.target / o.size * 10) / 10 : 0;
-      const pk = teamPicks(S.state.picks, o.team).map(p => esc(p.name));
-      return '<article class="order t' + o.team + '"><header><span>' + o.team + '조 주문서</span><small>' + o.size + '명</small></header>' +
+      const pk = teamItems(S.config.menu, S.state.picks, o.team).map(p => esc(p.name) + (p.common ? '(공통)' : ''));
+      const rank = order.indexOf(o.team) + 1;
+      return '<article class="order t' + o.team + (rank ? ' done' : '') + '"><header><span>' + o.team + '조 주문서</span>' + (rank ? '<b class="done-badge">완성 ' + rank + '등</b>' : '<small>' + o.size + '명</small>') + '</header>' +
         '<div class="tgt"><b class="num">' + o.target + '</b><span>개</span></div><p class="per">1명당 약 ' + per + '개' + (canapeName(o.team) ? ' · ' + esc(canapeName(o.team)) : '') + '</p>' +
         '<ul class="plates">' + o.plates.map(p => '<li class="t' + p.to + '"><i></i>' + p.to + '조 <b class="num">' + p.count + '</b></li>').join('') + '</ul>' +
-        (pk.length ? '<p class="picks">재료: ' + pk.join(' · ') + '</p>' : '') + '</article>';
+        (pk.length ? '<p class="picks">재료: ' + pk.join(' · ') + '</p>' : '') +
+        '<div class="op done-row"><button type="button" class="btn sm' + (rank ? ' ghost' : '') + '" data-act="done" data-team="' + o.team + '">' + (rank ? '완성 취소' : '완성! 종 울리기') + '</button></div></article>';
     }).join('') + '</div>' : '<div class="empty"><b>조 편성 뒤에 주문서가 나와요</b><span>2단계에서 조를 먼저 나눠 주세요.</span></div>');
 }
 function stageTaste() {
@@ -1647,6 +1949,7 @@ function resultCard(r, label, big, animate) {
   const quotes = r.comments.filter(q => !S.state.hidden[q.from + '-' + r.team]).slice(0, big ? 3 : 2);
   return '<article class="rcard t' + r.team + (animate ? ' new' : '') + (r.rank === 1 ? ' first' : '') + '"><header><span class="place">' + label + '</span><span class="team">' + r.team + '조</span><span class="score num">' + r.score + '<small>점</small></span></header>' +
     (canapeName(r.team) ? '<div class="cn">“' + esc(canapeName(r.team)) + '”</div>' : '') +
+    (rewardFor(r.rank) ? '<div class="reward">' + esc(rewardFor(r.rank)) + '</div>' : '') +
     (quotes.length ? '<ul class="quotes">' + quotes.map(q => quoteItem(q, r.team)).join('') + '</ul>' : '<p class="muted pad">시식평이 없어요</p>') + '</article>';
 }
 function podium(groups) {
@@ -1654,7 +1957,7 @@ function podium(groups) {
   groups.forEach(g => { by[g.rank] = g; });
   return '<div class="podium">' + [2, 1, 3].map(rk => {
     const g = by[rk];
-    return '<div class="col p' + rk + '">' + (g ? g.teams.map(r => resultCard(r, groupLabel(g), false, false)).join('') : '') + '<div class="step">' + (g ? groupLabel(g) : '') + '</div></div>';
+    return '<div class="col p' + rk + '">' + (g ? g.teams.map(r => resultCard(r, groupLabel(g), false, false)).join('') : '') + '<div class="step">' + (g ? groupLabel(g) + (rewardFor(g.rank) ? '<small>' + esc(rewardFor(g.rank)) + '</small>' : '') : '') + '</div></div>';
   }).join('') + '</div>';
 }
 function scoreTable(res) {
@@ -1700,7 +2003,8 @@ function winnersText() {
   const res = resultsNow().filter(r => r.rank <= 3 && r.score > 0);
   return S.config.eventName + ' Top3\n' + res.map(r => {
     const tch = teamTeachers(r.team).map(x => x.name).join(', ');
-    return r.rank + '위 ' + r.team + '조 (' + r.score + '점)' + (tch ? ' · ' + tch + ' 선생님' : '') + '\n' + members(r.team).map(k => k.name).join(', ');
+    const rw = rewardFor(r.rank);
+    return r.rank + '위 ' + r.team + '조 (' + r.score + '점' + (rw ? ' · ' + rw : '') + ')' + (tch ? ' · ' + tch + ' 선생님' : '') + '\n' + members(r.team).map(k => k.name).join(', ');
   }).join('\n\n');
 }
 function stageWinners() {
@@ -1711,6 +2015,7 @@ function stageWinners() {
     '<div class="winners">' + top.map(r => {
       const mem = members(r.team), tch = teamTeachers(r.team);
       return '<article class="ticket t' + r.team + '"><header><span class="tno">' + r.rank + '위</span><span class="tmeta"><span>' + r.team + '조 · ' + r.score + '점</span><span>' + (tch.length ? tch.map(x => esc(x.name)).join(', ') + ' 선생님' : '') + '</span></span><span class="tcount num">' + mem.length + '명</span></header>' +
+        (rewardFor(r.rank) ? '<div class="reward">' + esc(rewardFor(r.rank)) + '</div>' : '') +
         (canapeName(r.team) ? '<div class="cname">“' + esc(canapeName(r.team)) + '”</div>' : '') + '<div class="perf" aria-hidden="true"></div>' +
         '<ul class="members big">' + (mem.length ? mem.map(k => '<li>' + esc(k.name) + '</li>').join('') : '<li class="muted">명단 없음</li>') + '</ul></article>';
     }).join('') + '</div>' +
@@ -1726,7 +2031,19 @@ function panelFor(step) {
   if (step === 'draft') return panelDraft();
   if (step === 'vote') return panelVote();
   if (step === 'reveal') return panelReveal();
+  if (step === 'make') return '<span class="eyebrow">진행 도구</span><div class="row"><button type="button" class="btn ghost" data-act="done-reset">완성 기록 지우기</button></div>' + panelAlerts();
+  if (step === 'taste') return panelAlerts();
   return '';
+}
+function panelAlerts() {
+  return '<span class="eyebrow">알레르기 주의 · 선생님 폰에도 조별로 나와요</span><div class="card" data-dyn="alerts"></div>';
+}
+function alertsHtml() {
+  if (!kids().some(k => k.allergy)) return '<p class="hint">알레르기를 적은 친구가 없어요.</p>';
+  const list = allergyAlerts();
+  if (!list.length) return '<p class="hint">알레르기를 적은 친구는 있지만, 지금 재료와 겹치는 건 없어요. 재료 수령이 끝나면 다시 확인해 주세요.</p>';
+  return '<ul class="alert-list">' + list.map(a => '<li><b>' + esc(a.kid.name) + '</b>' + (a.team ? ' <span class="tag tteam t' + a.team + '">' + a.team + '조</span>' : '') +
+    ' <span class="muted">' + esc(a.kid.allergy) + '</span><span class="skip">' + esc(skipText(a)) + '</span></li>').join('') + '</ul>';
 }
 function panelDyn(name) {
   if (name === 'teachers') {
@@ -1749,10 +2066,12 @@ function panelDyn(name) {
   if (name === 'code-preview') return codePreviewHtml();
   if (name === 'manual-msg') return esc(ui.manualMsg);
   if (name === 'comment-review') return commentReview();
+  if (name === 'alerts') return alertsHtml();
   return '';
 }
 
 /* ---------- settings ---------- */
+const MODE_LABELS = {off: '사용 안 함', common: '모든 조 공통', '1': '조마다 1개', '2': '조마다 2개', '3': '조마다 3개'};
 function openSettings() {
   ui.settingsOpen = true;
   const d = $('#drawer');
@@ -1760,34 +2079,44 @@ function openSettings() {
   d.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-label="설정"><div class="row" style="justify-content:space-between"><h2>설정</h2><button type="button" class="icon-btn" data-act="settings-close">닫기</button></div>' +
     '<form class="card" data-form="config" autocomplete="off"><label class="field">대회 이름<input id="cfg-name" maxlength="30"></label>' +
     (IN_CLAUDE ? '<label class="field">투표 링크 (이 페이지 주소)<input id="cfg-url" inputmode="url" placeholder="https://claude.ai/..."></label>' : '<div class="field">선생님 화면 링크 (QR과 같은 주소)<div class="row"><input id="cfg-url" readonly style="flex:1 1 10rem"><button type="button" class="btn ghost sm" data-act="copy-link">복사</button></div></div>') +
-    '<fieldset class="field"><legend>조마다 받는 재료 개수</legend><label class="row"><input type="radio" name="cfg-mode" value="121"> 베이스 1 · 토핑 2 · 시즈닝 1 (4라운드)</label>' +
-    '<label class="row"><input type="radio" name="cfg-mode" value="132"> 베이스 1 · 토핑 3 · 시즈닝 2 (6라운드)</label></fieldset>' +
-    CAT_KEYS.map(cat => '<label class="field">' + CATS[cat] + ' 재료 (한 줄에 \'이름 세트수\')<textarea id="cfg-' + cat + '" rows="5"></textarea></label>').join('') +
-    '<button class="btn" type="submit">저장</button><p class="hint">세트 수가 1이면 ★ 한정 재료로 표시돼요.</p></form>' +
+    '<fieldset class="field"><legend>재료</legend><p class="hint">한 줄에 \'이름 세트수 #알레르기\'. 세트수는 그 재료를 가져갈 수 있는 조 수예요 (예: 슬라이스 치즈 3 #우유). 공통 칸은 세트수를 안 써도 돼요. 알레르기 표시는 산 제품의 표시로 확인해 주세요.</p>' +
+    KINDS.map(k => '<div class="kind-row"><div class="row"><b>' + CATS[k] + '</b><select id="cfg-mode-' + k + '" aria-label="' + CATS[k] + ' 고르는 방법">' +
+      KIND_MODES.map(m => '<option value="' + m + '">' + MODE_LABELS[m] + '</option>').join('') + '</select></div><textarea id="cfg-items-' + k + '" rows="4" aria-label="' + CATS[k] + ' 재료"></textarea></div>').join('') +
+    '<p class="hint">라운드 수(고르는 개수의 합)가 짝수면 모든 조의 순서가 똑같이 공평해요.</p></fieldset>' +
+    '<fieldset class="field"><legend>보상</legend><div class="row">' + [1, 2, 3].map(i => '<label class="field" style="flex:1 1 6rem">' + i + '등<input id="cfg-rw' + i + '" maxlength="20"></label>').join('') + '</div></fieldset>' +
+    '<fieldset class="field"><legend>조별 자리</legend><div class="seat-grid">' + TEAMS.map(t => '<label class="field">' + t + '조<select id="cfg-seat' + t + '">' +
+      SPOTS.map(x => '<option value="' + x.id + '">' + x.name + '</option>').join('') + '</select></label>').join('') + '</div></fieldset>' +
+    '<button class="btn" type="submit">저장</button></form>' +
     '<div class="card"><h3>초기화</h3><p class="hint">두 번 눌러야 실행돼요.</p><div class="row">' +
     '<button type="button" class="btn ghost sm" data-act="reset" data-what="votes">투표·발표</button><button type="button" class="btn ghost sm" data-act="reset" data-what="draft">가위바위보·재료 수령</button>' +
     '<button type="button" class="btn ghost sm" data-act="reset" data-what="teams">조 편성</button><button type="button" class="btn ghost sm" data-act="reset" data-what="timer">타이머</button>' +
+    '<button type="button" class="btn ghost sm" data-act="reset" data-what="menu">재료를 작년 기본값으로</button>' +
     '<button type="button" class="btn danger sm" data-act="reset" data-what="all">전체 (명단 포함)</button>' + (IN_CLAUDE ? '' : '<button type="button" class="btn ghost sm" data-act="reset" data-what="identity">QR 새로 만들기</button>') + '</div>' + (IN_CLAUDE ? '' : '<p class="hint">QR 새로 만들기를 하면 예전 QR로는 더 이상 들어올 수 없어요.</p>') + '</div>' +
-    '<div class="card"><h3>도움말</h3><p class="hint">' + statusInfo().explain + '</p><p class="hint">키보드: ← → 단계 이동 · Space 타이머 시작/멈춤 · P 발표 모드 · F 전체 화면 · Esc 닫기</p></div></div>';
+    '<div class="card"><h3>도움말</h3><p class="hint">' + statusInfo().explain + '</p><p class="hint">키보드: ← → 단계 이동 · Space 타이머 시작/멈춤 · P 슬라이드 · F 전체 화면 · Esc 닫기. 제작 슬라이드에서는 숫자 1~6으로 그 조 완성을 표시해요.</p></div></div>';
   d.hidden = false;
   $('#cfg-name').value = c.eventName;
   $('#cfg-url').value = IN_CLAUDE ? c.voteUrl : voteLink();
-  const radio = d.querySelector('input[name="cfg-mode"][value="' + c.draftMode + '"]');
-  if (radio) radio.checked = true;
-  CAT_KEYS.forEach(cat => { $('#cfg-' + cat).value = (c.ingredients[cat] || []).map(it => it.name + ' ' + it.sets).join('\n'); });
+  KINDS.forEach(k => { $('#cfg-mode-' + k).value = kindMode(c.menu, k); $('#cfg-items-' + k).value = itemsToText(kindItems(c.menu, k), kindMode(c.menu, k) === 'common'); });
+  [1, 2, 3].forEach(i => { $('#cfg-rw' + i).value = c.rewards[i - 1] || ''; });
+  TEAMS.forEach(t => { $('#cfg-seat' + t).value = c.seats[t]; });
 }
 function closeSettings() { ui.settingsOpen = false; const d = $('#drawer'); d.hidden = true; d.innerHTML = ''; }
 function saveConfig() {
   const name = ($('#cfg-name').value || '').trim().slice(0, 30) || DEFAULT_CONFIG.eventName;
   const url = IN_CLAUDE ? ($('#cfg-url').value || '').trim().slice(0, 300) : '';
   if (url && !/^https:\/\//.test(url)) { toast('링크는 https://로 시작해야 해요', 'bad'); return; }
-  const modeEl = document.querySelector('input[name="cfg-mode"]:checked');
-  const mode = modeEl ? modeEl.value : '121';
-  if (mode !== S.config.draftMode && S.state.picks.length) { toast('재료 수령 중에는 개수를 바꿀 수 없어요. 먼저 수령 기록을 초기화해 주세요', 'bad'); return; }
-  const ingredients = {};
-  CAT_KEYS.forEach(cat => { ingredients[cat] = parseIngredients($('#cfg-' + cat).value); });
-  writeEvent('config', 'merge', {eventName: name, voteUrl: url, draftMode: mode, ingredients: ingredients});
-  toast('설정을 저장했어요');
+  const menu = {};
+  KINDS.forEach(k => { menu[k] = {mode: $('#cfg-mode-' + k).value, items: parseIngredients($('#cfg-items-' + k).value)}; });
+  const empty = activeKinds(menu).filter(k => !kindItems(menu, k).length);
+  if (empty.length) { toast(empty.map(k => CATS[k]).join('·') + ' 칸에 재료가 없어요. 재료를 넣거나 \'사용 안 함\'으로 바꿔 주세요', 'bad'); return; }
+  if (S.state.picks.length && JSON.stringify(roundCats(menu)) !== JSON.stringify(roundCats(S.config.menu))) { toast('재료 수령 중에는 고르는 개수를 바꿀 수 없어요. 먼저 수령 기록을 초기화해 주세요', 'bad'); return; }
+  const seats = {};
+  TEAMS.forEach(t => { seats[t] = $('#cfg-seat' + t).value; });
+  if (new Set(TEAMS.map(t => seats[t])).size !== TEAM_COUNT) { toast('두 조가 같은 자리에 있어요. 조마다 다른 자리를 골라 주세요', 'bad'); return; }
+  const rewards = [1, 2, 3].map(i => ($('#cfg-rw' + i).value || '').trim().slice(0, 20));
+  writeEvent('config', 'merge', {eventName: name, voteUrl: url, menu: menu, rewards: rewards, seats: seats});
+  const short = menuShortages(menu);
+  toast(short.length ? '저장했어요. ' + short.map(x => CATS[x.cat] + ' ' + x.have + '세트(필요 ' + x.need + ')').join(', ') + '라 못 받는 조가 생겨요' : '설정을 저장했어요', short.length ? 'bad' : '');
   closeSettings();
 }
 function statusInfo() {
@@ -1930,16 +2259,26 @@ function rpsAdd(t) {
 }
 function rpsUndo() { writeState({rps: S.state.rps.slice(0, -1), picks: []}); }
 function doPick(name) {
-  const seq = draftSequence(S.state.rps, S.config.draftMode), picks = S.state.picks, cur = seq[picks.length];
-  if (!cur) return;
+  const seq = draftSequence(S.state.rps, roundCats(S.config.menu)), picks = S.state.picks, cur = seq[picks.length];
+  if (!cur || draftMismatch(seq, picks)) return;
   if (name) {
-    const rem = remainingSets(S.config.ingredients, picks);
+    const rem = remainingSets(S.config.menu, picks);
     if (!(rem[ingKey(cur.cat, name)] > 0)) return;
     if (teamPicks(picks, cur.team).some(p => p.cat === cur.cat && p.name === name)) return;
   }
   writeState({picks: picks.concat([{team: cur.team, cat: cur.cat, name: name || null, round: cur.round}])});
 }
 function pickUndo() { if (S.state.picks.length) writeState({picks: S.state.picks.slice(0, -1)}); }
+// A team rang the bell: record when, and how much making time was left.
+function toggleDone(t) {
+  if (TEAMS.indexOf(t) < 0 || !canMutate()) return;
+  const cur = S.state.done[t];
+  if (cur && cur.at) { writeState({done: {[t]: null}}); toast(t + '조 완성 표시를 지웠어요'); return; }
+  const r = timerRemaining('make');
+  writeState({done: {[t]: {at: Date.now(), left: r.active ? r.ms : null}}});
+  bell();
+  toast(t + '조 완성! ' + doneOrder().length + '등');
+}
 async function codeSave() {
   const p = ui.pastePreview;
   if (!p || p.error) return;
@@ -1980,12 +2319,18 @@ function doReset(what) {
   else if (what === 'draft') writeState({rps: [], picks: []});
   else if (what === 'teams') writeEvent('teams', 'set', {assign: {}, teacherAssign: {}, formedAt: null, rolls: 0});
   else if (what === 'timer') writeState({timer: null});
+  else if (what === 'done') writeState({done: null});
+  else if (what === 'menu') {
+    if (S.state.picks.length) { toast('재료 수령 중에는 바꿀 수 없어요. 먼저 수령 기록을 초기화해 주세요', 'bad'); return; }
+    writeEvent('config', 'merge', {menu: clone(DEFAULT_MENU)});
+    closeSettings();
+  }
   else if (what === 'all') {
     clearVotes();
     TEAMS.forEach(t => { if (S.canape[t] !== undefined) write('canape/t' + t, 'delete'); });
     writeEvent('roster', 'set', {kids: {}, teachers: {}});
     writeEvent('teams', 'set', {assign: {}, teacherAssign: {}, formedAt: null, rolls: 0});
-    writeEvent('state', 'set', {rps: [], picks: [], timer: {}, voting: {open: false}, reveal: {step: 0}, hidden: {}, voteResetAt: Date.now()});
+    writeEvent('state', 'set', {rps: [], picks: [], timer: {}, voting: {open: false}, reveal: {step: 0}, hidden: {}, done: {}, voteResetAt: Date.now()});
   }
   toast('초기화했어요');
 }
@@ -2141,6 +2486,8 @@ function voteHtml(t) {
   return '<div class="vapp gutter"><div class="vhead"><div class="brand"><b data-dyn="brand"></b><small>선생님 화면</small></div><span class="mini-timer" data-timer="*" hidden></span></div>' +
     '<div class="vband t' + t + '"><span class="tno">' + t + '조</span><span class="tmeta" data-vdyn="band"></span><button type="button" class="icon-btn" data-act="vteam-change">조 바꾸기</button></div>' +
     '<section class="vcard"><h2>우리 조</h2><div data-vdyn="members"></div></section>' +
+    '<section class="vcard warn-card" data-vsec="alerts" hidden><h2>시식 주의</h2><div data-vdyn="alerts"></div></section>' +
+    '<section class="vcard" data-vsec="picks" hidden><h2>우리 조 재료</h2><div data-vdyn="picks"></div></section>' +
     '<section class="vcard"><h2>까나페 이름</h2><div class="row"><input id="canape-name" maxlength="24" placeholder="예: 무지개 치즈 보트" style="flex:1 1 10rem"><button type="button" class="btn" data-act="canape-save">저장</button></div><p class="hint" data-vdyn="canape-msg"></p></section>' +
     '<section class="vcard" id="vote-sec"><h2>투표</h2><p class="hint" data-vdyn="vote-status"></p>' +
     '<p class="hint">1위·2위·3위를 한 조씩 고르고, 고른 조에는 시식평을 꼭 써 주세요. 좋았던 점 + 더 좋아질 점으로요.</p>' +
@@ -2172,7 +2519,7 @@ function renderVote() {
 function updateVoteDynamic(t) {
   const set = (k, html) => setHtml($('[data-vdyn="' + k + '"]'), html);
   const tch = teamTeachers(t);
-  set('band', '<span>' + COLOR_NAMES[t] + '</span><span>' + (tch.length ? esc(tch.map(x => x.name).join(', ')) + ' 선생님' : '') + '</span>');
+  set('band', '<span>' + COLOR_NAMES[t] + ' · ' + esc(seatName(t)) + '</span><span>' + (tch.length ? esc(tch.map(x => x.name).join(', ')) + ' 선생님' : '') + '</span>');
   let mh;
   if (PH.noKey) mh = '<p class="hint">링크가 완전하지 않아요. 진행 화면의 QR을 다시 찍어 주세요. 그동안은 투표 코드로 낼 수 있어요.</p>';
   else if (dbMode === 'relay' && !S.loaded) mh = '<p class="hint">진행 화면에서 정보를 받는 중이에요…</p>';
@@ -2182,10 +2529,26 @@ function updateVoteDynamic(t) {
   else if (!formed()) mh = '<p class="hint">아직 조 편성 전이에요. 편성이 끝나면 명단이 여기에 나와요.</p>';
   else {
     const mem = members(t), tg = computeTargets(sizes()).find(o => o.team === t);
-    mh = (mem.length ? '<ul class="vmembers">' + mem.map(k => '<li><b>' + esc(k.name) + '</b>' + (k.grade ? '<small>' + esc(k.grade) + '학년</small>' : '') + (k.allergy ? '<span class="allergy">알레르기: ' + esc(k.allergy) + '</span>' : '') + '</li>').join('') + '</ul>' : '<p class="hint">명단이 비어 있어요.</p>') +
+    mh = '<p class="seat-line">우리 자리: <b>' + esc(seatName(t)) + ' 테이블</b></p>' + roomSvg({highlight: t, cls: 'compact'}) +
+      (mem.length ? '<ul class="vmembers">' + mem.map(k => '<li><b>' + esc(k.name) + '</b>' + (k.grade ? '<small>' + esc(k.grade) + '학년</small>' : '') + (k.allergy ? '<span class="allergy">알레르기: ' + esc(k.allergy) + '</span>' : '') + '</li>').join('') + '</ul>' : '<p class="hint">명단이 비어 있어요.</p>') +
       (tg ? '<p class="target">만들 개수 <b>' + tg.target + '개</b> · ' + tg.plates.map(p => p.to + '조 ' + p.count).join(' · ') + '</p>' : '');
   }
   set('members', mh);
+  const ready = S.loaded && formed() && !PH.noKey && dbMode !== 'local';
+  // ingredients this team works with
+  const items = ready ? teamItems(S.config.menu, S.state.picks, t) : [];
+  const picked = items.some(i => !i.common);
+  const ps = $('[data-vsec="picks"]');
+  if (ps) ps.hidden = !picked;
+  set('picks', picked ? '<ul class="vpicks">' + items.map(i => '<li><small>' + CATS[i.cat] + (i.common ? ' · 공통' : '') + '</small>' + esc(i.name) + '</li>').join('') + '</ul>' : '');
+  // allergy: our kids who must skip plates, and kids elsewhere who can't eat ours
+  const alerts = ready ? allergyAlerts() : [];
+  const myKids = alerts.filter(a => a.team === t);
+  const blocked = alerts.filter(a => a.team !== t && a.hits.some(h => h.team === t || !h.team));
+  const as = $('[data-vsec="alerts"]');
+  if (as) as.hidden = !(myKids.length || blocked.length);
+  set('alerts', (myKids.length ? '<p class="hint">우리 조 친구가 먹으면 안 되는 까나페</p><ul class="alert-list">' + myKids.map(a => '<li><b>' + esc(a.kid.name) + '</b> <span class="muted">' + esc(a.kid.allergy) + '</span><span class="skip">' + esc(skipText(a, '우리 조')) + '</span></li>').join('') + '</ul>' : '') +
+    (blocked.length ? '<p class="hint">우리 까나페를 못 먹는 다른 조 친구</p><ul class="alert-list">' + blocked.map(a => '<li><b>' + esc(a.kid.name) + '</b> <span class="tag tteam t' + a.team + '">' + a.team + '조</span> <span class="muted">' + esc(a.kid.allergy) + '</span></li>').join('') + '</ul>' : ''));
   const cn = $('#canape-name');
   if (cn && !cn.value && document.activeElement !== cn && canapeName(t)) cn.value = canapeName(t);
   const pc = PH.pendingCanape && PH.pendingCanape.t === t ? PH.pendingCanape : null;
@@ -2285,9 +2648,12 @@ async function saveCanape(t) {
 /* ---------- stage slides ---------- */
 const SLIDES = [
   {key: 'cover', step: 'register', label: '표지'},
+  {key: 'about', step: 'register', label: '까나페란?'},
   {key: 'rules', step: 'register', label: '오늘의 순서'},
+  {key: 'reward', step: 'register', label: '보상'},
   {key: 'register', step: 'register', label: '도착'},
   {key: 'teams', step: 'teams', label: '조 편성'},
+  {key: 'seats', step: 'teams', label: '자리 배치'},
   {key: 'plan', step: 'plan', label: '기획 회의', timer: 'plan'},
   {key: 'menu', step: 'plan', label: '오늘의 재료'},
   {key: 'draft', step: 'draft', label: '재료 수령'},
@@ -2372,6 +2738,48 @@ function slRules() {
   return '<h2 class="sl-h">오늘의 순서</h2><ol class="sl-steps">' + steps.map((s, i) => '<li class="t' + (i + 1) + '"><b>' + (i + 1) + '</b><span>' + s[0] + '</span><small>' + s[1] + '</small></li>').join('') + '</ol>' +
     '<div class="sl-rule"><span>특별 규칙</span><b>우리 조 까나페는 다른 조 친구들이 먹어요</b><small>1위 5점 · 2위 3점 · 3위 1점 · 우리 조는 못 골라요</small></div>';
 }
+// A canapé seen from the side, one layer per kind in use, bottom first.
+function canapeSvg(kinds) {
+  const H = {base: 150, spread: 64, topping: 140, sauce: 46, seasoning: 90};
+  const total = kinds.reduce((s, k) => s + H[k], 0);
+  let yb = 330 + total / 2;
+  const out = [];
+  kinds.forEach(k => {
+    const y = yb;
+    if (k === 'base') {
+      let holes = '';
+      [y - 100, y - 50].forEach(hy => { for (let x = 125; x <= 640; x += 65) holes += '<circle cx="' + x + '" cy="' + hy + '" r="8" class="ab-hole"/>'; });
+      out.push('<rect x="60" y="' + (y - 150) + '" width="640" height="150" rx="34" class="ab-base"/>' + holes);
+    } else if (k === 'spread') {
+      out.push('<path class="ab-spread" d="M84 ' + y + ' L84 ' + (y - 36) + ' Q112 ' + (y - 76) + ' 150 ' + (y - 50) + ' T230 ' + (y - 50) + ' T310 ' + (y - 50) + ' T390 ' + (y - 50) + ' T470 ' + (y - 50) + ' T550 ' + (y - 50) + ' T630 ' + (y - 50) + ' Q664 ' + (y - 70) + ' 676 ' + (y - 36) + ' L676 ' + y + ' Z"/>');
+    } else if (k === 'topping') {
+      out.push('<ellipse cx="250" cy="' + (y - 46) + '" rx="150" ry="46" class="ab-ham"/><ellipse cx="250" cy="' + (y - 56) + '" rx="96" ry="22" class="ab-ham-in"/>' +
+        '<circle cx="482" cy="' + (y - 64) + '" r="64" style="fill:var(--t4)"/><circle cx="462" cy="' + (y - 86) + '" r="14" class="ab-shine"/>' +
+        '<circle cx="622" cy="' + (y - 42) + '" r="42" style="fill:var(--t6)"/><circle cx="610" cy="' + (y - 56) + '" r="9" class="ab-shine"/>');
+    } else if (k === 'sauce') {
+      out.push('<path class="ab-sauce" d="M120 ' + (y - 18) + ' C200 ' + (y - 60) + ' 262 ' + (y + 14) + ' 340 ' + (y - 22) + ' S480 ' + (y - 52) + ' 560 ' + (y - 14) + ' S640 ' + (y - 30) + ' 664 ' + (y - 22) + '"/>');
+    } else if (k === 'seasoning') {
+      const dots = [[150, 30], [205, 70], [262, 22], [318, 58], [372, 34], [430, 76], [486, 26], [540, 62], [596, 30], [648, 70], [178, 52], [350, 80], [512, 44]];
+      out.push(dots.map((d, i) => '<rect x="' + d[0] + '" y="' + (y - d[1]) + '" width="18" height="10" rx="5" transform="rotate(' + ((i * 37) % 90 - 45) + ' ' + (d[0] + 9) + ' ' + (y - d[1] + 5) + ')" style="fill:var(--t' + ((i % 5) + 1) + ')"/>').join(''));
+    }
+    yb -= H[k];
+  });
+  return '<svg class="sl-canape" viewBox="0 0 760 660" aria-hidden="true">' + out.join('') + '</svg>';
+}
+function slAbout() {
+  const menu = S.config.menu, kinds = activeKinds(menu);
+  const ex = k => { const names = kindItems(menu, k).map(it => it.name); let txt = ''; for (const n of names) { if ((txt + ' · ' + n).length > 24 && txt) break; txt = txt ? txt + ' · ' + n : n; } return txt; };
+  return '<div class="sl-about">' + canapeSvg(kinds) + '<div class="sl-about-r"><h2 class="sl-h">까나페란?</h2><p class="sl-sub">크래커 위에 여러 재료를 올린 한 입 크기의 애피타이저</p>' +
+    '<ol class="sl-layers">' + kinds.slice().reverse().map(k => '<li class="k-' + k + '"><i></i><div><b>' + CATS[k] + '</b><small>' + esc(ex(k)) + '</small></div><em>' + (kindMode(menu, k) === 'common' ? '모든 조 공통' : '조마다 ' + kindMode(menu, k) + '개') + '</em></li>').join('') + '</ol></div></div>';
+}
+function slReward() {
+  const rw = S.config.rewards;
+  return '<h2 class="sl-h">보상</h2><div class="sl-medals">' + [1, 2, 3].map(i => '<div class="sl-medal m' + i + '"><b>' + i + '등</b>' + (rw[i - 1] ? '<span>' + esc(rw[i - 1]) + '</span>' : '') + '</div>').join('') + '</div>' +
+    '<p class="sl-sub">조끼리 투표한 점수로 순위를 정해요 · 1위 5점 · 2위 3점 · 3위 1점</p>';
+}
+function slSeats() {
+  return '<h2 class="sl-h">' + (formed() ? '우리 조 자리로 가요' : '자리 배치') + '</h2><div class="sl-roomwrap">' + roomSvg({detail: formed()}) + '</div>';
+}
 function slRegister() {
   const list = kids(), n = list.length;
   const known = ui.slKnown || (ui.slKnown = new Set(list.map(k => k.id)));
@@ -2388,7 +2796,7 @@ function slTeams() {
   const sz = countBy(ui.tempAssign || S.teams.assign, list.map(k => k.id));
   return '<div class="sl-tickets">' + TEAMS.map(t => {
     const tch = ui.tempAssign ? [] : teamTeachers(t);
-    return '<article class="sl-ticket t' + t + '"><header><b>' + t + '조</b><span>' + (tch.length ? esc(tch.map(x => x.name).join(', ')) + ' 선생님' : COLOR_NAMES[t]) + '</span><em class="num">' + sz[t] + '명</em></header>' +
+    return '<article class="sl-ticket t' + t + '"><header><b>' + t + '조</b><span>' + esc(seatName(t)) + (tch.length ? ' · ' + esc(tch.map(x => x.name).join(', ')) : '') + '</span><em class="num">' + sz[t] + '명</em></header>' +
       (canapeName(t) && !ui.tempAssign ? '<p class="sl-cname">“' + esc(canapeName(t)) + '”</p>' : '') +
       '<ul>' + members(t).map(k => '<li>' + esc(k.name) + '</li>').join('') + '</ul></article>';
   }).join('') + '</div>';
@@ -2398,10 +2806,11 @@ function slPlan() {
     '<p class="sl-note">★ 재료는 딱 1세트! 먼저 고른 조만 가져가요</p></div></div>';
 }
 function slMenu() {
-  const counts = pickCounts(S.config.draftMode);
-  const rem = S.state.picks.length ? remainingSets(S.config.ingredients, S.state.picks) : null;
-  return '<div class="sl-menu">' + CAT_KEYS.map(cat => '<section><h3>' + CATS[cat] + '<small>조마다 ' + counts[cat] + '개</small></h3><ul>' +
-    (S.config.ingredients[cat] || []).map(it => {
+  const menu = S.config.menu, drafted = draftKinds(menu), common = commonKinds(menu);
+  const rem = S.state.picks.length ? remainingSets(menu, S.state.picks) : null;
+  return (common.length ? '<div class="sl-common">' + common.map(k => '<span><b>' + CATS[k] + '</b> 모든 조 공통 · ' + kindItems(menu, k).map(it => esc(it.name)).join(', ') + '</span>').join('') + '</div>' : '') +
+    '<div class="sl-menu" style="grid-template-columns:repeat(' + Math.max(1, Math.min(4, drafted.length)) + ',minmax(0,1fr))">' + drafted.map(cat => '<section><h3>' + CATS[cat] + '<small>조마다 ' + kindMode(menu, cat) + '개</small></h3><ul>' +
+    kindItems(menu, cat).map(it => {
       const left = rem ? rem[ingKey(cat, it.name)] : it.sets;
       return '<li class="' + (it.sets === 1 ? 'limited' : '') + (rem && left === 0 ? ' out' : '') + '"><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><span class="sets">' + (rem ? left + '/' + it.sets : it.sets + '세트') + '</span></li>';
     }).join('') + '</ul></section>').join('') + '</div>';
@@ -2413,13 +2822,14 @@ function slDraft() {
       ? '<li class="on t' + rps[i] + '"><b>' + CIRC[i] + '</b><span>' + rps[i] + '조</span></li>'
       : '<li><b>' + CIRC[i] + '</b><span class="muted">?</span></li>').join('') + '</ol><p class="sl-sub">1:1 세 판 → 이긴 3명끼리 → 진 3명끼리</p>';
   }
-  const seq = draftSequence(rps, S.config.draftMode), picks = S.state.picks, idx = picks.length;
+  const menu = S.config.menu, cats = roundCats(menu);
+  const seq = draftSequence(rps, cats), picks = S.state.picks, idx = picks.length;
   let top;
   if (idx < seq.length) {
-    const cur = seq[idx], rem = remainingSets(S.config.ingredients, picks);
+    const cur = seq[idx], rem = remainingSets(menu, picks);
     const have = teamPicks(picks, cur.team).filter(p => p.cat === cur.cat).map(p => p.name);
-    top = '<div class="sl-now t' + cur.team + '"><div><span>지금 고를 차례 · ' + (idx + 1) + '/' + seq.length + '</span><b>' + CIRC[cur.slot - 1] + ' ' + cur.team + '조</b></div><em>' + CATS[cur.cat] + ' ' + catOrdinal(S.config.draftMode, cur.round) + '</em></div>' +
-      '<div class="sl-ings">' + (S.config.ingredients[cur.cat] || []).map(it => {
+    top = '<div class="sl-now t' + cur.team + '"><div><span>지금 고를 차례 · ' + (idx + 1) + '/' + seq.length + '</span><b>' + CIRC[cur.slot - 1] + ' ' + cur.team + '조</b></div><em>' + CATS[cur.cat] + ' ' + catOrdinal(cats, cur.round) + '</em></div>' +
+      '<div class="sl-ings">' + kindItems(menu, cur.cat).map(it => {
         const left = rem[ingKey(cur.cat, it.name)], out = left <= 0 || have.indexOf(it.name) >= 0;
         return '<button type="button" class="sl-ing' + (out ? ' out' : '') + '" data-act="pick" data-name="' + esc(it.name) + '"' + (out || ui.stageView ? ' disabled' : '') + '><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><small>' + left + '/' + it.sets + '</small></button>';
       }).join('') + '</div>';
@@ -2430,9 +2840,15 @@ function slDraft() {
 }
 function slMake() {
   const orders = formed() ? computeTargets(sizes()) : [];
-  return '<div class="sl-make">' + slTimer('make') + (orders.length ? '<div class="sl-orders">' + orders.map(o =>
-    '<div class="sl-order t' + o.team + '"><header>' + o.team + '조</header><b class="num">' + o.target + '<small>개</small></b><p>' + o.plates.map(p => p.to + '조 ' + p.count).join(' · ') + '</p></div>').join('') + '</div>'
+  const order = doneOrder(), known = ui.slDone || (ui.slDone = new Set(order));
+  const html = '<div class="sl-make">' + slTimer('make') + (orders.length ? '<div class="sl-orders">' + orders.map(o => {
+    const rank = order.indexOf(o.team) + 1, d = S.state.done[o.team] || {};
+    return '<div class="sl-order t' + o.team + (rank ? ' done' : '') + '"><header>' + o.team + '조</header><b class="num">' + o.target + '<small>개</small></b><p>' + o.plates.map(p => p.to + '조 ' + p.count).join(' · ') + '</p>' +
+      (rank ? '<span class="sl-stamp' + (known.has(o.team) ? '' : ' new') + '">완성 ' + rank + '등' + (d.left != null ? '<small>남은 ' + fmtClock(d.left) + '</small>' : '') + '</span>' : '') + '</div>';
+  }).join('') + '</div>'
     : '<p class="sl-sub">조 편성 뒤에 조별 목표가 나와요</p>') + '</div>';
+  ui.slDone = new Set(order);
+  return html;
 }
 function slTaste() {
   return '<div class="sl-split">' + slTimer('taste') + '<ol class="sl-rules"><li><span><b>접시마다 1개씩</b>, 다섯 개를 다 맛봐요</span></li><li><span><b>한 입 먹고 물 한 모금</b></span></li><li><span><b>알레르기</b> 접시는 건너뛰어요</span></li><li><span>다 먹고 나서 <b>1·2·3위</b>를 정해요</span></li></ol></div>';
@@ -2447,6 +2863,7 @@ function slResultCard(r, label, big, animate) {
   const quotes = r.comments.filter(q => !S.state.hidden[q.from + '-' + r.team]).slice(0, big ? 3 : 2);
   return '<article class="sl-rcard t' + r.team + (animate ? ' new' : '') + '"><header><span class="place">' + label + '</span><span class="team">' + r.team + '조</span><span class="score num">' + r.score + '<small>점</small></span></header>' +
     (canapeName(r.team) ? '<div class="cn">“' + esc(canapeName(r.team)) + '”</div>' : '') +
+    (rewardFor(r.rank) ? '<div class="sl-reward">' + esc(rewardFor(r.rank)) + '</div>' : '') +
     '<ul class="sl-quotes">' + quotes.map(q => '<li>' + esc(String(q.text).slice(0, 80)) + '<cite>' + q.from + '조가 남긴 시식평</cite></li>').join('') + '</ul></article>';
 }
 function slReveal() {
@@ -2466,7 +2883,7 @@ function slReveal() {
   return '<h2 class="sl-h">오늘의 Top3</h2><div class="sl-podium">' + [2, 1, 3].map(rk => {
     const g = by[rk];
     return '<div class="sl-pcol p' + rk + '">' + (g ? g.teams.map(r => '<div class="sl-pcard t' + r.team + '"><header><b>' + r.team + '조</b><span class="num">' + r.score + '점</span></header>' + (canapeName(r.team) ? '<p>“' + esc(canapeName(r.team)) + '”</p>' : '') + '</div>').join('') : '') +
-      '<div class="sl-pstep">' + (g ? groupLabel(g) : '') + '</div></div>';
+      '<div class="sl-pstep">' + (g ? groupLabel(g) + (rewardFor(g.rank) ? '<small>' + esc(rewardFor(g.rank)) + '</small>' : '') : '') + '</div></div>';
   }).join('') + '</div>';
 }
 function slWinners() {
@@ -2474,7 +2891,7 @@ function slWinners() {
   if (!top.length) return '<div class="sl-center"><h2 class="sl-h">곧 Top3 명단이 나와요</h2></div>';
   return '<h2 class="sl-h">이름이 불리면 앞으로 나와요!</h2><div class="sl-winners" style="grid-template-columns:repeat(' + top.length + ',minmax(0,1fr))">' + top.map(r => {
     const mem = members(r.team);
-    return '<article class="sl-wcard t' + r.team + '"><header><b>' + r.rank + '위</b><span>' + r.team + '조 · ' + r.score + '점</span></header><ul style="--cols:' + (mem.length > 8 ? 2 : 1) + '">' +
+    return '<article class="sl-wcard t' + r.team + '"><header><b>' + r.rank + '위</b><span>' + r.team + '조 · ' + r.score + '점</span></header>' + (rewardFor(r.rank) ? '<p class="sl-wrw">' + esc(rewardFor(r.rank)) + '</p>' : '') + '<ul style="--cols:' + (mem.length > 5 ? 2 : 1) + '">' +
       (mem.length ? mem.map(k => '<li>' + esc(k.name) + '</li>').join('') : '<li class="muted">명단 없음</li>') + '</ul></article>';
   }).join('') + '</div>';
 }
@@ -2484,7 +2901,10 @@ function slThanks() {
 function slideInner(k) {
   switch (k) {
     case 'cover': return slCover();
+    case 'about': return slAbout();
     case 'rules': return slRules();
+    case 'reward': return slReward();
+    case 'seats': return slSeats();
     case 'register': return slRegister();
     case 'teams': return slTeams();
     case 'plan': return slPlan();
@@ -2523,6 +2943,7 @@ function ctrlHtml(k) {
     parts.push('<button type="button" class="icon-btn" data-act="sl-timer">' + (r.running && r.ms > 0 ? '타이머 멈춤 (T)' : '타이머 시작 (T)') + '</button><button type="button" class="icon-btn" data-act="timer-plus" data-key="' + meta.timer + '">+1분</button><button type="button" class="icon-btn" data-act="timer-reset" data-key="' + meta.timer + '">처음으로</button>');
   }
   if (k === 'teams' && !formed()) parts.push('<button type="button" class="icon-btn" data-act="form-teams">조 편성 시작</button>');
+  if (k === 'make') parts.push(TEAMS.map(t => { const on = !!(S.state.done[t] && S.state.done[t].at); return '<button type="button" class="team-mini t' + t + (on ? ' on' : '') + '" data-act="done" data-team="' + t + '" title="숫자 ' + t + '">' + t + '조' + (on ? ' ✓' : ' 완성') + '</button>'; }).join(''));
   if (k === 'vote') parts.push(S.state.voting.open ? '<button type="button" class="icon-btn" data-act="vote-close">투표 마감</button>' : '<button type="button" class="icon-btn" data-act="vote-open">투표 열기</button>');
   if (k === 'draft') {
     if (S.state.rps.length < TEAM_COUNT) parts.push(TEAMS.map(t => '<button type="button" class="team-mini t' + t + '" data-act="rps-add" data-team="' + t + '"' + (S.state.rps.indexOf(t) >= 0 ? ' disabled' : '') + '>' + t + '조</button>').join('') + '<button type="button" class="icon-btn" data-act="rps-undo">되돌리기</button>');
@@ -2632,6 +3053,8 @@ document.addEventListener('click', e => {
     case 'pick': doPick(d.name); break;
     case 'pick-undo': pickUndo(); break;
     case 'pick-skip': doPick(null); break;
+    case 'done': audio(); toggleDone(Number(d.team)); break;
+    case 'done-reset': if (confirmTwice(el, 'done-reset', '한 번 더 누르면 지워요')) doReset('done'); break;
     case 'vote-open': writeState({voting: {open: true, openedAt: Date.now()}}); break;
     case 'vote-close': writeState({voting: {open: false, closedAt: Date.now()}}); break;
     case 'code-read': { const ta = $('#code-input'); ui.pastePreview = decodeBallot(ta ? ta.value : '') || {error: true}; scheduleRender(); break; }
@@ -2689,6 +3112,7 @@ document.addEventListener('keydown', e => {
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].indexOf(e.code) >= 0) { e.preventDefault(); slidePrev(); }
     else if (e.code === 'KeyB' || e.code === 'Period') { e.preventDefault(); writeState({stage: {blank: !(S.state.stage || {}).blank}}); }
     else if (e.code === 'KeyT') { const m = slideMeta(stageSlide()); if (m.timer) { const r = timerRemaining(m.timer); if (r.running && r.ms > 0) timerPause(); else timerStart(m.timer); } }
+    else if (stageSlide() === 'make' && /^(Digit|Numpad)[1-6]$/.test(e.code)) { e.preventDefault(); audio(); toggleDone(Number(e.code.slice(-1))); }
     else if (e.key === 'Escape') exitSlides();
     return;
   }
