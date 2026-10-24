@@ -466,6 +466,8 @@ html.deck-on,html.deck-on body{overflow:hidden}
 .sl-menu li .sets{color:var(--sl-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .sl-menu li.limited .sets{color:var(--sl-warn)}
 .sl-menu li.out{color:var(--sl-muted);text-decoration:line-through}
+.sl-menu.c4 section{padding:24px 26px}
+.sl-menu.c4 li{font-size:30px;gap:12px}
 .sl-now{display:flex;align-items:center;gap:36px;background:var(--tc,var(--sl-ink));color:var(--on,var(--sl-bg));border-radius:34px;padding:26px 44px;flex:none}
 .sl-now span{font-size:32px;font-weight:700;opacity:.85;display:block}
 .sl-now b{font-family:var(--display);font-weight:400;font-size:116px;line-height:1}
@@ -747,7 +749,7 @@ const ALLERGY_GROUPS = [
   ['달걀', '계란', '알류', '난류'], ['우유', '유제품', '치즈', '버터', '크림', '요거트', '유당'], ['땅콩', '피넛'],
   ['견과', '견과류', '호두', '아몬드', '헤이즐넛', '잣', '캐슈넛', '피스타치오', '마카다미아', '피칸', '누텔라'],
   ['대두', '콩', '두유', '콩고물'], ['밀', '밀가루', '글루텐'], ['게', '갑각류', '게맛살', '크래미'], ['새우', '갑각류'],
-  ['생선', '어류', '참치', '고등어', '연어'], ['돼지고기', '돼지', '햄', '베이컨'], ['닭고기', '닭'], ['쇠고기', '소고기'],
+  ['생선', '어류', '참치', '고등어', '연어', '가다랑어', '가쓰오', '가쓰오부시'], ['돼지고기', '돼지', '햄', '베이컨'], ['닭고기', '닭'], ['쇠고기', '소고기'],
   ['조개', '조개류', '홍합'], ['오징어'], ['토마토'], ['복숭아'], ['메밀'], ['키위'], ['바나나'], ['딸기'], ['포도'], ['블루베리'], ['아황산']
 ];
 function allergyWords(text) {
@@ -892,10 +894,30 @@ const STEPS = [
   {key: 'vote', label: '투표', timer: 'vote'}, {key: 'reveal', label: '발표'}, {key: 'winners', label: 'Top3 명단'}
 ];
 const CIRC = ['①', '②', '③', '④', '⑤', '⑥'];
-// Last year's sheet: one shared base, then spread, topping, sauce and seasoning picked in rounds.
-// Peanut butter and Nutella are left out (no nuts); sets are sized so all six teams get one of each.
-// Allergy tags are typical contents; check the labels of what you buy.
+// What was bought (Coupang order of Oct 23, plus katsuobushi): one shared base, then spread, topping,
+// sauce and seasoning picked in rounds. Sets = how many teams can take an item; big tubs serve two or three.
+// Allergy tags are typical contents; check the labels of what you bought.
 const DEFAULT_MENU = {
+  base: {mode: 'common', items: [{name: '아이비 크래커', sets: 1, tags: ['밀', '우유', '대두']}]},
+  spread: {mode: '1', items: [
+    {name: '크림치즈 무스', sets: 1, tags: ['우유']}, {name: '고구마 무스', sets: 1, tags: ['우유']},
+    {name: '에그 샐러드', sets: 1, tags: ['달걀', '대두']}, {name: '감자 샐러드', sets: 1, tags: ['달걀', '대두']},
+    {name: '고구마 샐러드', sets: 1, tags: ['달걀', '대두', '우유']}, {name: '콘샐러드', sets: 1, tags: ['달걀', '대두']}]},
+  topping: {mode: '1', items: [
+    {name: '슬라이스 치즈', sets: 3, tags: ['우유']}, {name: '스모크햄', sets: 2, tags: ['돼지고기', '대두', '밀']},
+    {name: '크래미', sets: 2, tags: ['게', '달걀', '밀', '대두']}, {name: '샤인머스캣', sets: 2, tags: ['포도']},
+    {name: '바나나', sets: 1, tags: []}]},
+  sauce: {mode: '1', items: [
+    {name: '딸기잼', sets: 1, tags: []}, {name: '초코소스', sets: 1, tags: ['우유', '대두']},
+    {name: '메이플시럽', sets: 1, tags: []}, {name: '양념치킨 소스', sets: 2, tags: ['대두', '밀', '토마토']},
+    {name: '갈릭 디핑 소스', sets: 1, tags: ['달걀', '대두', '우유']}]},
+  seasoning: {mode: '1', items: [
+    {name: '허니버터 시즈닝', sets: 1, tags: ['우유']}, {name: '퍼니클 시즈닝', sets: 1, tags: ['우유', '대두', '밀']},
+    {name: '파마산 치즈', sets: 1, tags: ['우유']}, {name: '튀긴 양파 후레이크', sets: 3, tags: ['밀']},
+    {name: '가쓰오부시', sets: 1, tags: ['생선']}]}
+};
+// The previous built-in list (last year's sheet). A saved copy of it, unedited, follows the new default.
+const PREV_DEFAULT_MENU = {
   base: {mode: 'common', items: [{name: '아이비 크래커', sets: 1, tags: ['밀', '우유', '대두']}]},
   spread: {mode: '1', items: [
     {name: '에그 샐러드', sets: 1, tags: ['달걀', '대두']}, {name: '크림치즈', sets: 1, tags: ['우유']},
@@ -1029,7 +1051,8 @@ function normMenu(c) {
   if (c.menu && typeof c.menu === 'object') {
     const out = {};
     KINDS.forEach(k => { const m = obj(c.menu[k]); out[k] = {mode: KIND_MODES.indexOf(String(m.mode)) >= 0 ? String(m.mode) : 'off', items: sanitizeItems(m.items)}; });
-    return out;
+    const sig = m => JSON.stringify(KINDS.map(k => [kindMode(m, k), kindItems(m, k).map(it => [it.name, Number(it.sets)])]));
+    return sig(out) === sig(PREV_DEFAULT_MENU) ? clone(DEFAULT_MENU) : out;
   }
   const ing = obj(c.ingredients), old = ['base', 'topping', 'seasoning'];
   const sig = src => JSON.stringify(old.map(k => arr(src[k]).map(it => [it && it.name, Number(it && it.sets)])));
@@ -2094,7 +2117,7 @@ function openSettings() {
     '<div class="card"><h3>초기화</h3><p class="hint">두 번 눌러야 실행돼요.</p><div class="row">' +
     '<button type="button" class="btn ghost sm" data-act="reset" data-what="votes">투표·발표</button><button type="button" class="btn ghost sm" data-act="reset" data-what="draft">가위바위보·재료 수령</button>' +
     '<button type="button" class="btn ghost sm" data-act="reset" data-what="teams">조 편성</button><button type="button" class="btn ghost sm" data-act="reset" data-what="timer">타이머</button>' +
-    '<button type="button" class="btn ghost sm" data-act="reset" data-what="menu">재료를 작년 기본값으로</button>' +
+    '<button type="button" class="btn ghost sm" data-act="reset" data-what="menu">재료를 기본 목록으로</button>' +
     '<button type="button" class="btn danger sm" data-act="reset" data-what="all">전체 (명단 포함)</button>' + (IN_CLAUDE ? '' : '<button type="button" class="btn ghost sm" data-act="reset" data-what="identity">QR 새로 만들기</button>') + '</div>' + (IN_CLAUDE ? '' : '<p class="hint">QR 새로 만들기를 하면 예전 QR로는 더 이상 들어올 수 없어요.</p>') + '</div>' +
     '<div class="card"><h3>도움말</h3><p class="hint">' + statusInfo().explain + '</p><p class="hint">키보드: ← → 단계 이동 · Space 타이머 시작/멈춤 · P 슬라이드 · F 전체 화면 · Esc 닫기. 제작 슬라이드에서는 숫자 1~6으로 그 조 완성을 표시해요.</p></div></div>';
   d.hidden = false;
@@ -2813,7 +2836,7 @@ function slMenu() {
   const menu = S.config.menu, drafted = draftKinds(menu), common = commonKinds(menu);
   const rem = S.state.picks.length ? remainingSets(menu, S.state.picks) : null;
   return (common.length ? '<div class="sl-common">' + common.map(k => '<span><b>' + CATS[k] + '</b> 모든 조 공통 · ' + kindItems(menu, k).map(it => esc(it.name)).join(', ') + '</span>').join('') + '</div>' : '') +
-    '<div class="sl-menu" style="grid-template-columns:repeat(' + Math.max(1, Math.min(4, drafted.length)) + ',minmax(0,1fr))">' + drafted.map(cat => '<section><h3>' + CATS[cat] + '<small>조마다 ' + kindMode(menu, cat) + '개</small></h3><ul>' +
+    '<div class="sl-menu' + (drafted.length >= 4 ? ' c4' : '') + '" style="grid-template-columns:repeat(' + Math.max(1, Math.min(4, drafted.length)) + ',minmax(0,1fr))">' + drafted.map(cat => '<section><h3>' + CATS[cat] + '<small>조마다 ' + kindMode(menu, cat) + '개</small></h3><ul>' +
     kindItems(menu, cat).map(it => {
       const left = rem ? rem[ingKey(cat, it.name)] : it.sets;
       return '<li class="' + (it.sets === 1 ? 'limited' : '') + (rem && left === 0 ? ' out' : '') + '"><span>' + (it.sets === 1 ? '★ ' : '') + esc(it.name) + '</span><span class="sets">' + (rem ? left + '/' + it.sets : it.sets + '세트') + '</span></li>';
