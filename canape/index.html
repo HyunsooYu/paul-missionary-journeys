@@ -624,12 +624,16 @@ const COLOR_NAMES = {1: '빨강', 2: '주황', 3: '노랑', 4: '초록', 5: '파
 const KINDS = ['base', 'spread', 'topping', 'sauce', 'seasoning'];
 const CATS = {base: '베이스', spread: '스프레드', topping: '토핑', sauce: '소스', seasoning: '시즈닝'};
 const KIND_MODES = ['off', 'common', '1', '2', '3'];
-// Chapel: pulpit at the top, pews in the middle, three tables by the left windows, three behind the pews.
+// Chapel: pulpit at the top, pews in the middle, three tables by the left windows,
+// one in front of the pews on the window side, two behind the pews.
 const SPOTS = [
   {id: 'w1', name: '창가 앞'}, {id: 'w2', name: '창가 가운데'}, {id: 'w3', name: '창가 뒤'},
-  {id: 'b1', name: '뒤쪽 왼쪽'}, {id: 'b2', name: '뒤쪽 가운데'}, {id: 'b3', name: '뒤쪽 오른쪽'}
+  {id: 'f1', name: '회중석 앞 왼쪽'}, {id: 'b1', name: '뒤쪽 왼쪽'}, {id: 'b2', name: '뒤쪽 오른쪽'}
 ];
-const DEFAULT_SEATS = {1: 'w1', 2: 'w2', 3: 'w3', 4: 'b1', 5: 'b2', 6: 'b3'};
+const DEFAULT_SEATS = {1: 'w1', 2: 'w2', 3: 'w3', 4: 'f1', 5: 'b1', 6: 'b2'};
+// The first plan had three tables behind the pews; a saved copy of that default follows the new one.
+const OLD_DEFAULT_SEATS = {1: 'w1', 2: 'w2', 3: 'w3', 4: 'b1', 5: 'b2', 6: 'b3'};
+function isOldDefaultSeats(raw) { return !!raw && TEAMS.every(t => raw[t] === OLD_DEFAULT_SEATS[t]); }
 const POINTS = [5, 3, 1];
 const CODE_PREFIX = 'KC1-';
 
@@ -1048,7 +1052,7 @@ function applyEvent(d) {
     voteUrl: typeof c.voteUrl === 'string' ? c.voteUrl.slice(0, 300) : '',
     menu: normMenu(c),
     rewards: normRewards(c.rewards),
-    seats: normSeats(c.seats)
+    seats: normSeats(isOldDefaultSeats(c.seats) ? DEFAULT_SEATS : c.seats)
   };
   const st = obj(d.state);
   S.state = {
@@ -1740,13 +1744,13 @@ function panelRegister() {
     '<div class="row"><button type="button" class="btn ghost" data-act="sample-fill">연습용 넣기</button><button type="button" class="btn ghost" data-act="sample-clear">연습용 지우기</button></div></div></div>';
 }
 
-// The chapel, drawn from the user's description: pulpit at the top, pews in the middle,
-// three tables along the left windows and three behind the pews. Units are a 1600×820 floor.
-const SPOT_BOX = {w1: [90, 140, 300, 120], w2: [90, 300, 300, 120], w3: [90, 460, 300, 120], b1: [365, 640, 290, 130], b2: [695, 640, 290, 130], b3: [1025, 640, 290, 130]};
+// The chapel, drawn from the user's description: pulpit at the top, pews in the middle, three tables along
+// the left windows, one in front of the left pews (window side) and two behind the pews. Units: a 1600×820 floor.
+const SPOT_BOX = {w1: [80, 150, 280, 120], w2: [80, 320, 280, 120], w3: [80, 490, 280, 120], f1: [500, 150, 280, 120], b1: [500, 630, 280, 130], b2: [840, 630, 280, 130]};
 function roomSvg(o) {
   const opt = o || {}, sz = formed() ? sizes() : null;
   let pews = '';
-  for (let i = 0; i < 7; i++) pews += '<rect class="room-pew" x="560" y="' + (180 + i * 50) + '" width="250" height="28" rx="8"/><rect class="room-pew" x="870" y="' + (180 + i * 50) + '" width="250" height="28" rx="8"/>';
+  for (let i = 0; i < 7; i++) pews += '<rect class="room-pew" x="500" y="' + (300 + i * 40) + '" width="280" height="24" rx="8"/><rect class="room-pew" x="840" y="' + (300 + i * 40) + '" width="280" height="24" rx="8"/>';
   const tables = TEAMS.map(t => {
     const b = SPOT_BOX[S.config.seats[t]] || SPOT_BOX.w1, cx = b[0] + b[2] / 2;
     const sub = opt.detail ? [sz ? sz[t] + '명' : '', teamTeachers(t).map(x => x.name).join(', ')].filter(Boolean).join(' · ') : '';
@@ -1755,12 +1759,12 @@ function roomSvg(o) {
       '<text class="tno" x="' + cx + '" y="' + (b[1] + (sub ? 62 : b[3] / 2 + 22)) + '" text-anchor="middle">' + t + '조</text>' +
       (sub ? '<text class="tsub" x="' + cx + '" y="' + (b[1] + 102) + '" text-anchor="middle">' + esc(sub.length > 16 ? sub.slice(0, 15) + '…' : sub) + '</text>' : '') + '</g>';
   }).join('');
-  return '<svg class="room' + (opt.cls ? ' ' + opt.cls : '') + '" viewBox="0 0 1600 820" role="img" aria-label="자리 배치: 위쪽 강대상, 가운데 회중석, 왼쪽 창가에 테이블 3개, 회중석 뒤에 테이블 3개">' +
+  return '<svg class="room' + (opt.cls ? ' ' + opt.cls : '') + '" viewBox="0 0 1600 820" role="img" aria-label="자리 배치: 위쪽 강대상, 가운데 회중석, 왼쪽 창가에 테이블 3개, 회중석 앞 왼쪽에 1개, 회중석 뒤에 2개">' +
     '<rect class="room-floor" x="4" y="4" width="1592" height="812" rx="28"/>' +
-    '<rect class="room-stage" x="560" y="4" width="560" height="114" rx="18"/><text class="room-label" x="840" y="76" text-anchor="middle">강대상</text>' +
-    pews + '<rect class="room-pill" x="740" y="312" width="200" height="60" rx="30"/><text class="room-label" x="840" y="356" text-anchor="middle">회중석</text>' +
-    [130, 290, 450].map(y => '<rect class="room-window" x="4" y="' + y + '" width="16" height="140" rx="4"/>').join('') +
-    '<text class="room-label sm" x="52" y="360" text-anchor="middle" transform="rotate(-90 52 360)">창가</text>' + tables + '</svg>';
+    '<rect class="room-stage" x="580" y="4" width="460" height="106" rx="18"/><text class="room-label" x="810" y="72" text-anchor="middle">강대상</text>' +
+    pews + '<rect class="room-pill" x="710" y="402" width="200" height="60" rx="30"/><text class="room-label" x="810" y="446" text-anchor="middle">회중석</text>' +
+    [150, 320, 490].map(y => '<rect class="room-window" x="4" y="' + y + '" width="16" height="120" rx="4"/>').join('') +
+    '<text class="room-label sm" x="48" y="380" text-anchor="middle" transform="rotate(-90 48 380)">창가</text>' + tables + '</svg>';
 }
 function ticket(t, size) {
   const mem = members(t), tch = ui.animating ? [] : teamTeachers(t);
