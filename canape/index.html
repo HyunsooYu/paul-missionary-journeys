@@ -2028,6 +2028,48 @@ function panelReveal() {
   return '<span class="eyebrow">진행 도구 · 시식평 확인</span><p class="hint">숨긴 시식평은 발표 화면에 나오지 않아요. 프로젝터에 비치지 않게 확인하려면 휴대폰에서 이 페이지의 진행 화면을 열어 확인하세요.</p><div class="card" data-dyn="comment-review"></div>';
 }
 
+// Everything the day produced, to keep or to make a video from later. Allergy notes and grades stay out.
+function resultsExport() {
+  const byTeam = {}, order = doneOrder();
+  resultsNow().forEach(r => { byTeam[r.team] = r; });
+  return {
+    eventName: S.config.eventName, exportedAt: new Date().toISOString(), rewards: S.config.rewards.slice(),
+    teams: TEAMS.map(t => {
+      const r = byTeam[t] || {score: 0, rank: 0, firsts: 0, seconds: 0, thirds: 0, comments: []};
+      return {
+        team: t, color: COLOR_NAMES[t], seat: seatName(t), canape: canapeName(t),
+        members: members(t).map(k => k.name), teachers: teamTeachers(t).map(x => x.name),
+        ingredients: teamItems(S.config.menu, S.state.picks, t).map(it => ({kind: CATS[it.cat] || it.cat, name: it.name, common: !!it.common})),
+        finishedOrder: order.indexOf(t) + 1 || null,
+        score: r.score, rank: r.score > 0 ? r.rank : null, firsts: r.firsts, seconds: r.seconds, thirds: r.thirds,
+        comments: r.comments.map(q => ({from: q.from, place: q.place || null, text: q.text, hidden: !!S.state.hidden[q.from + '-' + t]}))
+      };
+    })
+  };
+}
+function resultsText() {
+  const d = resultsExport();
+  const teams = d.teams.slice().sort((a, b) => (a.rank || 99) - (b.rank || 99) || a.team - b.team);
+  return d.eventName + ' 결과\n\n' + teams.map(t => {
+    const shown = t.comments.filter(q => !q.hidden);
+    return [t.rank ? t.rank + '위' : '', t.team + '조', t.canape ? '“' + t.canape + '”' : '', t.score + '점'].filter(Boolean).join(' ') +
+      '\n  재료: ' + (t.ingredients.map(i => i.name).join(', ') || '-') +
+      (t.teachers.length ? '\n  선생님: ' + t.teachers.join(', ') : '') +
+      '\n  조원: ' + (t.members.join(', ') || '-') +
+      (shown.length ? '\n  시식평: ' + shown.map(q => '“' + q.text + '” (' + q.from + '조)').join(' / ') : '');
+  }).join('\n\n');
+}
+function downloadText(name, text, type) {
+  const url = URL.createObjectURL(new Blob([text], {type: type}));
+  const a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+function exportFile() {
+  const d = new Date(), stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+  downloadText('canape-results-' + stamp + '.json', JSON.stringify(resultsExport(), null, 2), 'application/json');
+  toast('결과 파일을 저장했어요');
+}
 function winnersText() {
   const res = resultsNow().filter(r => r.rank <= 3 && r.score > 0);
   return S.config.eventName + ' Top3\n' + res.map(r => {
@@ -2039,7 +2081,7 @@ function winnersText() {
 function stageWinners() {
   const res = resultsNow(), top = res.filter(r => r.rank <= 3 && r.score > 0);
   if (!top.length) return head('9단계 · Top3 명단', 'Top3 명단', '') + '<div class="empty"><b>발표가 끝나면 여기에 명단이 나와요</b><span>투표가 들어오면 Top3 조원 이름을 바로 확인할 수 있어요.</span></div>';
-  const right = '<div class="row op"><button type="button" class="btn" data-act="copy-winners">명단 복사</button><button type="button" class="btn ghost" data-act="toggle-allc">' + (ui.showAllComments ? '시식평 닫기' : '모든 조 시식평') + '</button></div>';
+  const right = '<div class="row op"><button type="button" class="btn" data-act="copy-winners">명단 복사</button><button type="button" class="btn ghost" data-act="export-file">결과 저장</button><button type="button" class="btn ghost" data-act="toggle-allc">' + (ui.showAllComments ? '시식평 닫기' : '모든 조 시식평') + '</button></div>';
   return head('9단계 · Top3 명단', '이름이 불리면 앞으로 나와요', '', right) +
     '<div class="winners">' + top.map(r => {
       const mem = members(r.team), tch = teamTeachers(r.team);
@@ -2116,6 +2158,8 @@ function openSettings() {
     '<fieldset class="field"><legend>조별 자리</legend><div class="seat-grid">' + TEAMS.map(t => '<label class="field">' + t + '조<select id="cfg-seat' + t + '">' +
       SPOTS.map(x => '<option value="' + x.id + '">' + x.name + '</option>').join('') + '</select></label>').join('') + '</div></fieldset>' +
     '<button class="btn" type="submit">저장</button></form>' +
+    '<div class="card"><h3>결과 내보내기</h3><p class="hint">조별 까나페 이름·재료·점수·시식평·명단을 파일로 저장하거나 글로 복사해요. 알레르기 메모와 학년은 넣지 않아요.</p><div class="row">' +
+    '<button type="button" class="btn ghost sm" data-act="export-file">결과 파일 저장</button><button type="button" class="btn ghost sm" data-act="export-text">결과 글로 복사</button></div></div>' +
     '<div class="card"><h3>초기화</h3><p class="hint">두 번 눌러야 실행돼요.</p><div class="row">' +
     '<button type="button" class="btn ghost sm" data-act="reset" data-what="votes">투표·발표</button><button type="button" class="btn ghost sm" data-act="reset" data-what="draft">가위바위보·재료 수령</button>' +
     '<button type="button" class="btn ghost sm" data-act="reset" data-what="teams">조 편성</button><button type="button" class="btn ghost sm" data-act="reset" data-what="timer">타이머</button>' +
@@ -3093,6 +3137,8 @@ document.addEventListener('click', e => {
     case 'toggle-scores': ui.showScores = !ui.showScores; scheduleRender(); break;
     case 'hide': toggleHide(d.key); break;
     case 'copy-winners': copyText(winnersText()); break;
+    case 'export-file': exportFile(); break;
+    case 'export-text': copyText(resultsText()); break;
     case 'toggle-allc': ui.showAllComments = !ui.showAllComments; scheduleRender(); break;
     case 'reset': if (confirmTwice(el, 'reset-' + d.what, '한 번 더 누르면 초기화')) doReset(d.what); break;
     case 'go-ops': ui.forceOperator = true; setHash('ops'); break;
