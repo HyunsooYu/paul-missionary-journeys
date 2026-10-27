@@ -148,6 +148,15 @@ body.present .optool{display:none!important}
 .ticket .tmeta span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ticket .tcount{margin-left:auto;font-family:var(--display);font-size:1.35rem;white-space:nowrap}
 .ticket .cname{padding:.6rem 1rem 0;font-family:var(--display);font-size:1.2rem;overflow-wrap:anywhere}
+.ticket .tgrades{padding:.45rem 1rem 0;font-size:.8rem;font-weight:700;color:var(--muted)}
+.modes{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:.3rem;padding:.3rem;background:var(--sunk);border-radius:14px;margin-top:.9rem}
+.mode{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.95rem;padding:.5rem .9rem;border-radius:10px;cursor:pointer}
+.mode.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.mode:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.mode-note{margin:.5rem 0 0;max-width:44rem;line-height:1.55}
+.mode-note b{display:inline;font-family:inherit;font-size:inherit;font-weight:700;color:var(--ink)}
+.card .modes{margin-top:0;align-self:flex-start}
+.card .mode-note{margin:0}
 .perf{position:relative;margin:.65rem 1rem 0;border-top:2px dashed var(--line)}
 .perf::before,.perf::after{content:"";position:absolute;top:-9px;width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}
 .perf::before{left:calc(-1rem - 9px)}.perf::after{right:calc(-1rem - 9px)}
@@ -651,20 +660,100 @@ function shuffle(list, rng) {
 }
 function gradeKey(g) { const n = parseInt(g, 10); return Number.isFinite(n) ? n : 99; }
 
-// Deal kids round-robin into a random team order. Sorting a shuffled list by grade
-// (stable sort) keeps the random order inside each grade and spreads grades evenly.
+// How the six teams are made: grades spread evenly over every team, each grade in its own teams, or no grade at all.
+const TEAM_MODES = ['mix', 'grade', 'random'];
+const TEAM_MODE_LABELS = {mix: '학년 고르게 섞기', grade: '학년별로 나누기', random: '완전 무작위'};
+function normTeamMode(m) { return TEAM_MODES.indexOf(m) >= 0 ? m : 'mix'; }
+// Kids with a grade, grouped by grade, lowest first. Kids without a grade are left out.
+function gradeGroups(kids) {
+  const by = {};
+  kids.forEach(k => { const g = gradeKey(k.grade); if (g !== 99) (by[g] = by[g] || []).push(k); });
+  return Object.keys(by).map(Number).sort((a, b) => a - b).map(g => ({grade: g, kids: by[g]}));
+}
+// Which teams each grade gets when grades are kept apart: every grade at least one team, then each spare team goes
+// to the grade whose teams are biggest, so team sizes stay as even as they can. Teams are numbered upward from
+// the youngest grade. Empty when it cannot be done (no grades, or more grades than teams).
+function gradeTeamPlan(counts) {
+  const groups = counts.filter(c => c.n > 0).map(c => ({grade: c.grade, n: c.n, teams: 1}));
+  if (!groups.length || groups.length > TEAM_COUNT) return [];
+  for (let left = TEAM_COUNT - groups.length; left > 0; left--) {
+    let best = groups[0];
+    groups.forEach(g => { const a = g.n / g.teams, b = best.n / best.teams; if (a > b || (a === b && g.n > best.n)) best = g; });
+    best.teams += 1;
+  }
+  let next = 0;
+  groups.forEach(g => { g.teamList = TEAMS.slice(next, next + g.teams); next += g.teams; });
+  return groups;
+}
+// Sizes the teams of each grade would have, e.g. [8, 7, 7].
+function planSizes(p) {
+  const base = Math.floor(p.n / p.teams), extra = p.n % p.teams;
+  return p.teamList.map((t, i) => base + (i < extra ? 1 : 0));
+}
 function formTeams(kids, teachers, opts) {
   const o = opts || {};
   const r = o.rng || Math.random;
-  let ordered = shuffle(kids, r);
-  if (o.balanceGrades !== false) ordered = ordered.sort((a, b) => gradeKey(a.grade) - gradeKey(b.grade));
-  const teamOrder = shuffle(TEAMS, r);
+  const mode = o.mode ? normTeamMode(o.mode) : (o.balanceGrades === false ? 'random' : 'mix');
   const assign = {};
-  ordered.forEach((k, i) => { assign[k.id] = teamOrder[i % TEAM_COUNT]; });
+  const groups = gradeGroups(kids), plan = mode === 'grade' ? gradeTeamPlan(groups.map(g => ({grade: g.grade, n: g.kids.length}))) : [];
+  if (plan.length) {
+    // each grade is dealt over its own teams; which of them gets one extra kid is random
+    plan.forEach((p, i) => {
+      const order = shuffle(p.teamList, r);
+      shuffle(groups[i].kids, r).forEach((k, j) => { assign[k.id] = order[j % order.length]; });
+    });
+    const sizes = countBy(assign, kids.map(k => k.id));
+    shuffle(kids.filter(k => gradeKey(k.grade) === 99), r).forEach(k => { const t = smallestTeam(sizes, r); assign[k.id] = t; sizes[t] += 1; });
+  } else {
+    // deal round-robin into a random team order; sorting a shuffled list by grade (stable sort) keeps the random
+    // order inside each grade and spreads every grade evenly over the six teams
+    let ordered = shuffle(kids, r);
+    if (mode !== 'random') ordered = ordered.sort((a, b) => gradeKey(a.grade) - gradeKey(b.grade));
+    const teamOrder = shuffle(TEAMS, r);
+    ordered.forEach((k, i) => { assign[k.id] = teamOrder[i % TEAM_COUNT]; });
+  }
   const tTeams = shuffle(TEAMS, r);
   const teacherAssign = {};
   shuffle(teachers, r).forEach((t, i) => { teacherAssign[t.id] = tTeams[i % TEAM_COUNT]; });
-  return {assign: assign, teacherAssign: teacherAssign};
+  return {assign: assign, teacherAssign: teacherAssign, mode: mode === 'grade' && !plan.length ? 'mix' : mode};
+}
+// The grade most kids of a team are in (0 when nobody has a grade).
+function mainGrade(list) {
+  const c = {};
+  list.forEach(k => { const g = gradeKey(k.grade); if (g !== 99) c[g] = (c[g] || 0) + 1; });
+  const keys = Object.keys(c).map(Number).sort((a, b) => c[b] - c[a] || a - b);
+  return keys.length ? keys[0] : 0;
+}
+// Where a kid who arrives after the teams are made should go: the smallest team that suits the mode.
+// placed: [{grade, team}] for the kids already in teams.
+function lateTeam(grade, placed, mode, rng) {
+  const g = gradeKey(grade), sizes = {}, same = {}, byTeam = {};
+  TEAMS.forEach(t => { sizes[t] = 0; same[t] = 0; byTeam[t] = []; });
+  placed.forEach(k => {
+    const t = Number(k.team);
+    if (sizes[t] === undefined) return;
+    sizes[t] += 1; byTeam[t].push(k);
+    if (gradeKey(k.grade) === g) same[t] += 1;
+  });
+  let cands = TEAMS.slice();
+  if (mode === 'grade' && g !== 99) {
+    const own = TEAMS.filter(t => mainGrade(byTeam[t]) === g);
+    if (own.length) cands = own;
+  }
+  const min = Math.min.apply(null, cands.map(t => sizes[t]));
+  cands = cands.filter(t => sizes[t] === min);
+  if (mode === 'mix' && g !== 99) {
+    const fewest = Math.min.apply(null, cands.map(t => same[t]));
+    cands = cands.filter(t => same[t] === fewest);
+  }
+  const r = rng || Math.random;
+  return cands[Math.floor(r() * cands.length)];
+}
+// '5학년 4 · 6학년 3' for a list of kids; kids without a grade are counted as '학년 없음'.
+function gradeMix(list) {
+  const c = {};
+  list.forEach(k => { const g = gradeKey(k.grade); c[g] = (c[g] || 0) + 1; });
+  return Object.keys(c).map(Number).sort((a, b) => a - b).map(g => (g === 99 ? '학년 없음 ' : g + '학년 ') + c[g]).join(' · ');
 }
 function sizeSummary(n) {
   if (!n) return '';
@@ -1076,7 +1165,8 @@ function applyEvent(d) {
     voteUrl: typeof c.voteUrl === 'string' ? c.voteUrl.slice(0, 300) : '',
     menu: normMenu(c),
     rewards: normRewards(c.rewards),
-    seats: normSeats(isOldDefaultSeats(c.seats) ? DEFAULT_SEATS : c.seats)
+    seats: normSeats(isOldDefaultSeats(c.seats) ? DEFAULT_SEATS : c.seats),
+    teamMode: normTeamMode(c.teamMode)
   };
   const st = obj(d.state);
   S.state = {
@@ -1088,7 +1178,8 @@ function applyEvent(d) {
   const ro = obj(d.roster);
   S.roster = {kids: obj(ro.kids), teachers: obj(ro.teachers)};
   const tm = obj(d.teams);
-  S.teams = {assign: obj(tm.assign), teacherAssign: obj(tm.teacherAssign), formedAt: tm.formedAt || null, rolls: Number(tm.rolls) || 0};
+  S.teams = {assign: obj(tm.assign), teacherAssign: obj(tm.teacherAssign), formedAt: tm.formedAt || null, rolls: Number(tm.rolls) || 0,
+    mode: tm.mode ? normTeamMode(tm.mode) : (tm.gradeBalance === false ? 'random' : 'mix')};
 }
 
 /* derived */
@@ -1791,10 +1882,28 @@ function roomSvg(o) {
     WIN_Y.map(y => '<rect class="room-window" x="4" y="' + y + '" width="16" height="116" rx="4"/>').join('') +
     '<text class="room-label sm" x="48" y="462" text-anchor="middle" transform="rotate(-90 48 462)">창가</text>' + tables + '</svg>';
 }
+// The three ways to make teams, as a row of buttons, with what the chosen one will do.
+function modePicker() {
+  const m = S.config.teamMode;
+  return '<div class="modes op" role="radiogroup" aria-label="조 나누는 방법">' + TEAM_MODES.map(x =>
+    '<button type="button" role="radio" aria-checked="' + (x === m) + '" class="mode' + (x === m ? ' on' : '') + '" data-act="team-mode" data-mode="' + x + '">' + TEAM_MODE_LABELS[x] + '</button>').join('') +
+    '</div><p class="hint mode-note">' + modeNote(m) + '</p>';
+}
+function modeNote(m) {
+  const list = kids(), none = list.filter(k => gradeKey(k.grade) === 99).length;
+  const noneLine = none ? ' 학년이 없는 아이 ' + none + '명은 ' + (m === 'grade' ? '인원이 적은 조로 가요.' : '학년과 상관없이 섞여요.') : '';
+  if (m === 'random') return '학년과 상관없이 무작위로 섞어요.';
+  if (m === 'mix') return '학년마다 여섯 조에 고르게 나눠요.' + noneLine;
+  const plan = gradeTeamPlan(gradeGroups(list).map(g => ({grade: g.grade, n: g.kids.length})));
+  if (!plan.length) return '학년이 입력된 아이가 없어서 학년별로 나눌 수 없어요. 등록할 때 학년을 골라 주세요.';
+  return plan.map(p => '<b>' + p.grade + '학년 ' + p.n + '명</b> → ' + (p.teams > 1 ? p.teamList[0] + '~' + p.teamList[p.teamList.length - 1] + '조' : p.teamList[0] + '조') +
+    ' (' + planSizes(p).join('·') + '명)').join(' · ') + '.' + noneLine;
+}
 function ticket(t, size) {
   const mem = members(t), tch = ui.animating ? [] : teamTeachers(t);
   const who = tch.length ? tch.map(x => esc(x.name)).join(', ') + ' 선생님' : (formed() && !ui.animating ? '담당 선생님 미정' : '');
   return '<article class="ticket t' + t + '"><header><span class="tno">' + t + '조</span><span class="tmeta"><span>' + COLOR_NAMES[t] + ' · ' + esc(seatName(t)) + '</span><span>' + who + '</span></span><span class="tcount num">' + size + '명</span></header>' +
+    (!ui.animating && mem.length && mem.some(k => k.grade) ? '<div class="tgrades">' + gradeMix(mem) + '</div>' : '') +
     (canapeName(t) && !ui.animating ? '<div class="cname">“' + esc(canapeName(t)) + '”</div>' : '') +
     '<div class="perf" aria-hidden="true"></div><ul class="members">' + mem.map(k =>
       '<li><button type="button" class="mem' + (ui.moveKid === k.id ? ' sel' : '') + '" data-act="kid-pick" data-id="' + k.id + '">' + esc(k.name) + (k.grade ? '<small>' + esc(k.grade) + '</small>' : '') + '</button></li>').join('') + '</ul>' +
@@ -1804,7 +1913,8 @@ function stageTeams() {
   const list = kids(), n = list.length;
   if (!formed() && !ui.animating) {
     return head('2단계 · 랜덤 조 편성', n + '명을 6개 조로 나눠요', (n ? sizeSummary(n) + ' · ' : '') + '선생님 ' + teachers().length + '명도 함께 섞어요') +
-      '<div class="empty"><b>준비되면 조 편성을 시작하세요</b><span>' + (n < 6 ? '아이가 6명보다 적어요. 먼저 등록해 주세요.' : '학년이 고르게 섞이도록 나눠요.') + '</span>' +
+      '<div class="empty"><b>준비되면 조 편성을 시작하세요</b><span>' + (n < 6 ? '아이가 6명보다 적어요. 먼저 등록해 주세요.' : '조 나누는 방법을 고른 뒤 시작하세요.') + '</span>' +
+      modePicker() +
       '<div class="op" style="margin-top:.8rem"><button type="button" class="btn big" data-act="form-teams"' + (n ? '' : ' disabled') + '>조 편성 시작</button></div></div>' +
       '<section class="room-card"><h2>자리 배치</h2>' + roomSvg({}) + '</section>';
   }
@@ -1818,8 +1928,8 @@ function stageTeams() {
 }
 function panelTeams() {
   return '<span class="eyebrow">진행 도구</span><div class="cards">' +
-    '<div class="card"><h3>다시 섞기</h3><label class="row hint"><input type="checkbox" id="grade-balance" checked> 학년이 고르게 섞이게</label>' +
-    '<div class="row"><button type="button" class="btn ghost" data-act="reroll">다시 섞기</button></div>' +
+    '<div class="card"><h3>다시 섞기</h3><p class="hint">이번 조: ' + TEAM_MODE_LABELS[S.teams.mode] + '</p>' + modePicker() +
+    '<div class="row"><button type="button" class="btn ghost" data-act="reroll">이 방법으로 다시 섞기</button></div>' +
     '<p class="hint">다시 섞기는 두 번 눌러야 실행돼요. 아이 이름을 누르면 다른 조로 옮길 수 있어요.</p></div>' +
     '<div class="card"><h3>선생님 폰 연결</h3><div data-dyn="qr-mini"></div></div></div>';
 }
@@ -2213,7 +2323,7 @@ function addKid(name, grade, allergy) {
   ui.freshId = id;
   writeEvent('roster', 'merge', {kids: {[id]: {name: name, grade: grade || '', allergy: allergy || '', at: Date.now()}}});
   if (formed()) {
-    const t = smallestTeam(sizes());
+    const t = lateTeam(grade, placedKids(id), S.teams.mode);
     writeEvent('teams', 'merge', {assign: {[id]: t}});
     toast(name + ' → ' + t + '조');
   }
@@ -2305,12 +2415,10 @@ async function doFormTeams(reroll) {
   const list = kids();
   if (!list.length) { toast('먼저 아이를 등록해 주세요'); return; }
   if (formed() && !reroll) { toast('이미 나눴어요. 다시 하려면 \'다시 섞기\'를 두 번 눌러 주세요'); return; }
-  const gb = $('#grade-balance');
-  const balance = gb ? gb.checked : true;
-  const result = formTeams(list.map(k => ({id: k.id, grade: k.grade})), teachers().map(t => ({id: t.id})), {balanceGrades: balance});
+  const result = formTeams(list.map(k => ({id: k.id, grade: k.grade})), teachers().map(t => ({id: t.id})), {mode: S.config.teamMode});
   if (!prefersReduced()) await shuffleAnimation(list);
   ui.tempAssign = null; ui.animating = false; ui.moveKid = null;
-  writeEvent('teams', 'set', {assign: result.assign, teacherAssign: result.teacherAssign, formedAt: Date.now(), rolls: (S.teams.rolls || 0) + 1, gradeBalance: balance});
+  writeEvent('teams', 'set', {assign: result.assign, teacherAssign: result.teacherAssign, formedAt: Date.now(), rolls: (S.teams.rolls || 0) + 1, mode: result.mode});
 }
 function moveKid(id, t) {
   if (!id || TEAMS.indexOf(t) < 0) return;
@@ -2319,10 +2427,18 @@ function moveKid(id, t) {
   ui.moveKid = null;
   toast((k ? k.name : '') + ' → ' + t + '조');
 }
+// Kids already in a team, as {grade, team}; skip leaves one kid out.
+function placedKids(skip) {
+  return kids().filter(k => k.id !== skip && teamOfReal(k.id)).map(k => ({grade: k.grade, team: teamOfReal(k.id)}));
+}
 function assignRest() {
-  const sz = sizes(), patch = {};
-  kids().filter(k => !teamOfReal(k.id)).forEach(k => { const t = smallestTeam(sz); patch[k.id] = t; sz[t] += 1; });
+  const placed = placedKids(), patch = {};
+  kids().filter(k => !teamOfReal(k.id)).forEach(k => { const t = lateTeam(k.grade, placed, S.teams.mode); patch[k.id] = t; placed.push({grade: k.grade, team: t}); });
   if (Object.keys(patch).length) writeEvent('teams', 'merge', {assign: patch});
+}
+function setTeamMode(m) {
+  if (!canMutate() || TEAM_MODES.indexOf(m) < 0 || m === S.config.teamMode) return;
+  writeEvent('config', 'merge', {teamMode: m});
 }
 function rpsAdd(t) {
   const rps = S.state.rps.slice();
@@ -2865,11 +2981,16 @@ function slRegister() {
 }
 function slTeams() {
   const list = kids();
-  if (!formed() && !ui.animating) return '<div class="sl-center"><h2 class="sl-h">곧 조 편성이 시작돼요!</h2><p class="sl-sub">' + list.length + '명 · ' + (sizeSummary(list.length) || '아직 등록 전') + '</p></div>';
+  if (!formed() && !ui.animating) {
+    const plan = S.config.teamMode === 'grade' ? gradeTeamPlan(gradeGroups(list).map(g => ({grade: g.grade, n: g.kids.length}))) : [];
+    return '<div class="sl-center"><h2 class="sl-h">곧 조 편성이 시작돼요!</h2><p class="sl-sub">' + list.length + '명 · ' +
+      (plan.length ? plan.map(p => p.grade + '학년 ' + (p.teams > 1 ? p.teamList[0] + '~' + p.teamList[p.teamList.length - 1] + '조' : p.teamList[0] + '조')).join(' · ') : (sizeSummary(list.length) || '아직 등록 전')) + '</p></div>';
+  }
   const sz = countBy(ui.tempAssign || S.teams.assign, list.map(k => k.id));
   return '<div class="sl-tickets">' + TEAMS.map(t => {
     const tch = ui.tempAssign ? [] : teamTeachers(t);
-    return '<article class="sl-ticket t' + t + '"><header><b>' + t + '조</b><span>' + esc(seatName(t)) + (tch.length ? ' · ' + esc(tch.map(x => x.name).join(', ')) : '') + '</span><em class="num">' + sz[t] + '명</em></header>' +
+    const g = !ui.tempAssign && S.teams.mode === 'grade' ? mainGrade(members(t)) : 0;
+    return '<article class="sl-ticket t' + t + '"><header><b>' + t + '조</b><span>' + (g ? g + '학년 · ' : '') + esc(seatName(t)) + (tch.length ? ' · ' + esc(tch.map(x => x.name).join(', ')) : '') + '</span><em class="num">' + sz[t] + '명</em></header>' +
       (canapeName(t) && !ui.tempAssign ? '<p class="sl-cname">“' + esc(canapeName(t)) + '”</p>' : '') +
       '<ul>' + members(t).map(k => '<li>' + esc(k.name) + '</li>').join('') + '</ul></article>';
   }).join('') + '</div>';
@@ -3111,6 +3232,7 @@ document.addEventListener('click', e => {
     case 'sample-fill': sampleFill(); break;
     case 'sample-clear': if (confirmTwice(el, 'sample-clear', '한 번 더 누르면 지워요')) sampleClear(); break;
     case 'form-teams': doFormTeams(false); break;
+    case 'team-mode': setTeamMode(d.mode); break;
     case 'reroll': if (confirmTwice(el, 'reroll', '한 번 더 누르면 다시 섞어요')) doFormTeams(true); break;
     case 'kid-pick': if (!ui.present && !readOnly) { ui.moveKid = ui.moveKid === d.id ? null : d.id; scheduleRender(); } break;
     case 'move-here': moveKid(ui.moveKid, Number(d.team)); break;
